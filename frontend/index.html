@@ -821,6 +821,9 @@ let totalStacks     = 0;
 let filtroAtivo     = 'Todos';
 let serverOnline    = false;
 
+// ── XSS protection: escapa HTML em dados dinâmicos ──
+function esc(s) { const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
 // banco de exemplos (fallback offline)
 const DEMO_DB = {
   python:{name:"Python",icon:"🐍",color:"#3776AB",category:"Backend",description:"Linguagem versátil para backend e ciência de dados.",curiosity:"O nome Python vem do grupo de comédia Monty Python, não da cobra. Guido van Rossum criou a linguagem em 1991 enquanto assistia ao programa. Python é a linguagem mais ensinada em universidades dos EUA desde 2014.",example_title:"API REST com Flask",example:`from flask import Flask, jsonify, request\n\napp = Flask(__name__)\ntarefas = []\n\n@app.route("/tarefas", methods=["GET"])\ndef listar():\n    return jsonify(tarefas)\n\n@app.route("/tarefas", methods=["POST"])\ndef criar():\n    dado = request.get_json()\n    t = {"id": len(tarefas)+1, "titulo": dado["titulo"], "feita": False}\n    tarefas.append(t)\n    return jsonify(t), 201\n\nif __name__ == "__main__":\n    app.run(debug=True)`},
@@ -1174,9 +1177,10 @@ function renderGrid(stacks, filtro='Todos') {
   sec.style.display='block';
 
   const cats = ['Todos', ...new Set(stacks.map(s=>s.category).filter(Boolean))];
-  document.getElementById('frow').innerHTML = cats.map(c=>
-    `<button class="fbtn ${c===filtro?'on':''}" onclick="renderGrid(stacksAll,'${c}')">${c}</button>`
-  ).join('');
+  document.getElementById('frow').innerHTML = cats.map(c=>{
+    const ec = esc(c);
+    return `<button class="fbtn ${c===filtro?'on':''}" onclick="renderGrid(stacksAll,'${ec}')">${ec}</button>`;
+  }).join('');
 
   const filtradas = filtro==='Todos' ? stacks : stacks.filter(s=>s.category===filtro);
   document.getElementById('scount').textContent = `${filtradas.length} de ${stacks.length} stacks`;
@@ -1185,15 +1189,16 @@ function renderGrid(stacks, filtro='Todos') {
     const pronta = stacksReady.some(r=>r.id===s.id);
     const proc   = !pronta && processados < totalStacks;
     const sel    = stackAtiva===s.id;
+    const eid = esc(s.id);
     return `
       <div class="scard ${pronta?'ready':''} ${sel?'selected':''}"
-           style="--sc:${s.color||'var(--amber)'}; animation-delay:${i*50}ms"
-           id="card-${s.id}" onclick="selecionarStack('${s.id}')">
+           style="--sc:${esc(s.color)||'var(--amber)'}; animation-delay:${i*50}ms"
+           id="card-${eid}" onclick="selecionarStack('${eid}')">
         <div class="spin-ring"><div class="spin"></div></div>
         <div class="cdot"></div>
-        <div class="cicon">${s.icon||'📦'}</div>
-        <div class="cname">${s.name}</div>
-        <div class="ccat">${s.category||''}</div>
+        <div class="cicon">${esc(s.icon)||'📦'}</div>
+        <div class="cname">${esc(s.name)}</div>
+        <div class="ccat">${esc(s.category)||''}</div>
       </div>`;
   }).join('');
 }
@@ -1215,7 +1220,7 @@ function atualizarTabs() {
   const tabs = document.getElementById('vtabs');
   tabs.innerHTML = stacksReady.map(s=>
     `<div class="vtab ${stackAtiva===s.id?'active':''}"
-          onclick="mostrarViewer('${s.id}')">${s.icon} ${s.name}</div>`
+          onclick="mostrarViewer('${esc(s.id)}')">${esc(s.icon)} ${esc(s.name)}</div>`
   ).join('');
 }
 

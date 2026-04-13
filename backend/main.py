@@ -16,8 +16,10 @@ from contextlib import asynccontextmanager
 
 import fitz                         # PyMuPDF
 import pika                         # RabbitMQ client
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, UploadFile, File, HTTPException
+from pydantic import BaseModel, constr
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, UploadFile, File, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
@@ -27,9 +29,10 @@ log = logging.getLogger("stack-radar")
 # ─────────────────────────────────────────────────────────────
 #  CONFIG
 # ─────────────────────────────────────────────────────────────
-RABBITMQ_URL = os.getenv("RABBITMQ_URL", "amqp://guest:guest@localhost:5672/")
-QUEUE_NAME   = "stack_radar"
-MAX_PDF_MB   = 10
+RABBITMQ_URL    = os.getenv("RABBITMQ_URL", "amqp://guest:guest@localhost:5672/")
+QUEUE_NAME      = "stack_radar"
+MAX_PDF_MB      = 10
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*").split(",")
 
 # ─────────────────────────────────────────────────────────────
 #  BANCO DE STACKS COM EXEMPLOS REAIS
@@ -890,7 +893,7 @@ def consumer_thread(session_id: str, total: int, loop: asyncio.AbstractEventLoop
     except Exception as e:
         log.error(f"[CONSUMER] Erro na sessão {session_id}: {e}")
         asyncio.run_coroutine_threadsafe(
-            ws_manager.send(session_id, {"type": "error", "message": str(e)}),
+            ws_manager.send(session_id, {"type": "error", "message": "Erro interno no processamento"}),
             loop
         )
 
@@ -905,11 +908,23 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Stack Radar", version="1.0.0", lifespan=lifespan)
 
+# ── Security headers middleware ──
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+        return response
+
+app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=ALLOWED_ORIGINS,
+    allow_methods=["GET", "POST"],
+    allow_headers=["Content-Type"],
 )
 
 # Serve o frontend estático (procura em ./frontend e ../frontend)
@@ -949,18 +964,20 @@ async def upload_pdf(pdf: UploadFile = File(...)):
     Recebe o PDF, extrai texto, detecta stacks e publica no RabbitMQ.
     Retorna session_id para o cliente se conectar via WebSocket.
     """
-    if not pdf.filename.lower().endswith(".pdf"):
+    if not pdf.filename or not pdf.filename.lower().endswith(".pdf"):
         raise HTTPException(400, "Apenas arquivos .pdf são aceitos")
 
-    conteudo = await pdf.read()
-    if len(conteudo) > MAX_PDF_MB * 1024 * 1024:
+    # Leitura limitada: evita DoS por upload excessivo
+    max_bytes = MAX_PDF_MB * 1024 * 1024
+    conteudo = await pdf.read(max_bytes + 1)
+    if len(conteudo) > max_bytes:
         raise HTTPException(413, f"PDF muito grande (máx {MAX_PDF_MB} MB)")
 
     # Extrai texto do PDF
     try:
         texto = extrair_texto_pdf(conteudo)
-    except Exception as e:
-        raise HTTPException(422, f"Erro ao ler o PDF: {e}")
+    except Exception:
+        raise HTTPException(422, "Erro ao ler o PDF: arquivo corrompido ou formato inválido")
 
     if len(texto.strip()) < 50:
         raise HTTPException(422, "PDF sem texto legível (pode ser imagem/escaneado)")
@@ -979,34 +996,57 @@ async def upload_pdf(pdf: UploadFile = File(...)):
         "stacks": [{"id": s["id"], "name": s["name"], "icon": s["icon"]} for s in stacks],
     }
 
+def _validate_session_id(session_id: str) -> None:
+    """Valida que session_id é um UUID v4 válido."""
+    try:
+        uuid.UUID(session_id, version=4)
+    except ValueError:
+        raise HTTPException(400, "session_id inválido")
+
+class StackItem(BaseModel):
+    id: constr(pattern=r'^[a-z0-9_-]{1,30}$')
+    name: str
+    icon: str = "📦"
+
+class ProcessarPayload(BaseModel):
+    stacks: list[StackItem]
+
 @app.post("/processar/{session_id}")
-async def processar(session_id: str, payload: dict):
+async def processar(session_id: str, payload: ProcessarPayload):
     """
     Dispara o pipeline RabbitMQ para uma sessão.
     Recebe as stacks detectadas, publica na fila e inicia o consumer em thread.
     """
-    stacks = payload.get("stacks", [])
+    _validate_session_id(session_id)
+    stacks = payload.stacks
     if not stacks:
         raise HTTPException(400, "Nenhuma stack para processar")
 
     loop = asyncio.get_event_loop()
 
+    stacks_dicts = [s.model_dump() for s in stacks]
+
     # Publica na fila (em thread para não bloquear o event loop)
-    await asyncio.to_thread(publicar_stacks, stacks, session_id)
+    await asyncio.to_thread(publicar_stacks, stacks_dicts, session_id)
 
     # Inicia consumer em thread separada
     t = threading.Thread(
         target=consumer_thread,
-        args=(session_id, len(stacks), loop),
+        args=(session_id, len(stacks_dicts), loop),
         daemon=True,
     )
     t.start()
 
-    return {"status": "pipeline_iniciado", "session_id": session_id, "total": len(stacks)}
+    return {"status": "pipeline_iniciado", "session_id": session_id, "total": len(stacks_dicts)}
 
 @app.websocket("/ws/{session_id}")
 async def websocket_endpoint(websocket: WebSocket, session_id: str):
     """WebSocket: browser conecta aqui para receber eventos em tempo real."""
+    try:
+        uuid.UUID(session_id, version=4)
+    except ValueError:
+        await websocket.close(code=1008, reason="session_id inválido")
+        return
     await ws_manager.connect(session_id, websocket)
     try:
         # Mantém a conexão viva até o cliente desconectar

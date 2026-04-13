@@ -229,3 +229,51 @@ class TestUpload:
     def test_upload_invalid_type_returns_400(self):
         r = client.post("/upload", files={"pdf": ("test.txt", b"hello", "text/plain")})
         assert r.status_code == 400
+
+
+# ─────────────────────────────────────────────────────────────
+#  SECURITY
+# ─────────────────────────────────────────────────────────────
+class TestSecurity:
+    def test_security_headers_present(self):
+        r = client.get("/health")
+        assert r.headers["X-Content-Type-Options"] == "nosniff"
+        assert r.headers["X-Frame-Options"] == "DENY"
+        assert r.headers["X-XSS-Protection"] == "1; mode=block"
+        assert r.headers["Referrer-Policy"] == "strict-origin-when-cross-origin"
+        assert "Permissions-Policy" in r.headers
+
+    def test_processar_invalid_session_id(self):
+        r = client.post("/processar/not-a-uuid", json={"stacks": [{"id": "python", "name": "Python"}]})
+        assert r.status_code == 400
+
+    def test_processar_missing_stacks(self):
+        import uuid as _uuid
+        sid = str(_uuid.uuid4())
+        r = client.post(f"/processar/{sid}", json={"stacks": []})
+        assert r.status_code == 400
+
+    def test_processar_invalid_stack_id(self):
+        import uuid as _uuid
+        sid = str(_uuid.uuid4())
+        r = client.post(f"/processar/{sid}", json={"stacks": [{"id": "<script>alert(1)</script>", "name": "xss"}]})
+        assert r.status_code == 422
+
+    def test_processar_no_body(self):
+        import uuid as _uuid
+        sid = str(_uuid.uuid4())
+        r = client.post(f"/processar/{sid}")
+        assert r.status_code == 422
+
+    def test_upload_no_filename_returns_error(self):
+        r = client.post("/upload", files={"pdf": ("", b"data", "application/pdf")})
+        assert r.status_code in (400, 422)
+
+    def test_error_message_no_internal_leak(self):
+        """Verifica que erros no consumer não vazam detalhes internos."""
+        from main import consumer_thread
+        # O consumer_thread envia "Erro interno no processamento" (não str(e))
+        import inspect
+        src = inspect.getsource(consumer_thread)
+        assert "Erro interno no processamento" in src
+        assert '"message": str(e)' not in src
