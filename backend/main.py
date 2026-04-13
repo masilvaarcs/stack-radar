@@ -892,8 +892,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Serve o frontend estático
-frontend_dir = Path(__file__).parent.parent / "frontend"
+# Serve o frontend estático (procura em ./frontend e ../frontend)
+frontend_dir = Path(__file__).parent / "frontend"
+if not frontend_dir.exists():
+    frontend_dir = Path(__file__).parent.parent / "frontend"
 if frontend_dir.exists():
     app.mount("/static", StaticFiles(directory=str(frontend_dir)), name="static")
 
