@@ -180,6 +180,9 @@ stack-radar/
 │   ├── main.py              ← FastAPI + RabbitMQ + WebSocket
 │   ├── requirements.txt
 │   └── Dockerfile           ← build local
+├── docs/
+│   ├── card_config.json     ← config do evidence card
+│   └── evidencia-card.svg   ← card de evidência (README)
 ├── frontend/
 │   └── index.html           ← UI completa (HTML + CSS + JS)
 ├── Dockerfile               ← build produção (Railway)

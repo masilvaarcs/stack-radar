@@ -36,7 +36,7 @@ MAX_PDF_MB   = 10
 # ─────────────────────────────────────────────────────────────
 STACK_DB: dict = {
     "python": {
-        "name": "Python", "icon": "🐍", "color": "#3b82f6", "category": "Backend",
+        "name": "Python", "icon": "🐍", "color": "#3776AB", "category": "Backend",
         "description": "Linguagem versátil para backend, data science e automação.",
         "example_title": "API REST com Flask",
         "example": """\
@@ -60,7 +60,7 @@ if __name__ == "__main__":
     app.run(debug=True)"""
     },
     "flask": {
-        "name": "Flask", "icon": "🌶️", "color": "#ef4444", "category": "Backend",
+        "name": "Flask", "icon": "🌶️", "color": "#44b78b", "category": "Backend",
         "description": "Microframework web leve e flexível para Python.",
         "example_title": "Blueprint com autenticação JWT",
         "example": """\
@@ -97,7 +97,7 @@ def login():
     return jsonify({"erro": "Credenciais inválidas"}), 401"""
     },
     "fastapi": {
-        "name": "FastAPI", "icon": "⚡", "color": "#06b6d4", "category": "Backend",
+        "name": "FastAPI", "icon": "⚡", "color": "#009688", "category": "Backend",
         "description": "Framework moderno e rápido para APIs com tipagem Python.",
         "example_title": "CRUD assíncrono com Pydantic",
         "example": """\
@@ -136,7 +136,7 @@ async def atualizar(item_id: int, item: Item):
     return {"status": "atualizado"}"""
     },
     "django": {
-        "name": "Django", "icon": "🎸", "color": "#22c55e", "category": "Backend",
+        "name": "Django", "icon": "🎸", "color": "#44B78B", "category": "Backend",
         "description": "Framework full-stack com ORM, admin e autenticação incluídos.",
         "example_title": "Model + View com Django ORM",
         "example": """\
@@ -175,7 +175,7 @@ class ProdutoView(View):
         return JsonResponse({"produtos": qs})"""
     },
     "react": {
-        "name": "React", "icon": "⚛️", "color": "#38bdf8", "category": "Frontend",
+        "name": "React", "icon": "⚛️", "color": "#61DAFB", "category": "Frontend",
         "description": "Biblioteca para construção de interfaces declarativas e reativas.",
         "example_title": "Hook useFetch + Context API",
         "example": """\
@@ -213,7 +213,7 @@ export function useFetch(url) {
 }"""
     },
     "angular": {
-        "name": "Angular", "icon": "🔺", "color": "#f97316", "category": "Frontend",
+        "name": "Angular", "icon": "🔺", "color": "#DD0031", "category": "Frontend",
         "description": "Framework completo com DI, RxJS e roteamento integrados.",
         "example_title": "Service + RxJS + Component",
         "example": """\
@@ -244,7 +244,7 @@ export class ProdutoService {
 }"""
     },
     "typescript": {
-        "name": "TypeScript", "icon": "🔷", "color": "#60a5fa", "category": "Frontend",
+        "name": "TypeScript", "icon": "🔷", "color": "#3178C6", "category": "Frontend",
         "description": "Superset tipado do JavaScript para projetos escaláveis.",
         "example_title": "Repositório genérico + Decorators",
         "example": """\
@@ -283,7 +283,7 @@ const ativos = repo.filtrar(u => u.ativo);
 console.log(ativos.map(u => u.nome)); // ["Marcos"]"""
     },
     "javascript": {
-        "name": "JavaScript", "icon": "🟡", "color": "#fbbf24", "category": "Frontend",
+        "name": "JavaScript", "icon": "🟡", "color": "#F7DF1E", "category": "Frontend",
         "description": "Linguagem universal da web, client e server-side.",
         "example_title": "EventBus + Promise.all",
         "example": """\
@@ -321,7 +321,7 @@ bus.emit("pedido:criado", { id: 42, valor: 149.90 });
 unsub();"""
     },
     "node": {
-        "name": "Node.js", "icon": "🟢", "color": "#4ade80", "category": "Backend",
+        "name": "Node.js", "icon": "🟢", "color": "#339933", "category": "Backend",
         "description": "Runtime JavaScript server-side baseado no V8.",
         "example_title": "Express + Zod + Middleware",
         "example": """\
@@ -365,7 +365,7 @@ app.post("/produtos", validar(ProdutoSchema), (req, res) => {
 app.listen(3000, () => console.log("🚀 :3000"));"""
     },
     "docker": {
-        "name": "Docker", "icon": "🐳", "color": "#0ea5e9", "category": "DevOps",
+        "name": "Docker", "icon": "🐳", "color": "#2496ED", "category": "DevOps",
         "description": "Containerização de aplicações para ambientes reproduzíveis.",
         "example_title": "Dockerfile + docker-compose completo",
         "example": """\
@@ -414,7 +414,7 @@ volumes:
   pgdata:"""
     },
     "postgresql": {
-        "name": "PostgreSQL", "icon": "🐘", "color": "#818cf8", "category": "Database",
+        "name": "PostgreSQL", "icon": "🐘", "color": "#336791", "category": "Database",
         "description": "Banco relacional robusto com suporte a JSON, window functions e CTEs.",
         "example_title": "Window Functions + CTE avançado",
         "example": """\
@@ -452,7 +452,7 @@ WHERE pos <= 5
 ORDER BY mes DESC, pos;"""
     },
     "sql": {
-        "name": "SQL", "icon": "🗄️", "color": "#a78bfa", "category": "Database",
+        "name": "SQL", "icon": "🗄️", "color": "#E38C00", "category": "Database",
         "description": "Linguagem padrão para consulta e manipulação de bancos relacionais.",
         "example_title": "JOIN complexo com segmentação de clientes",
         "example": """\
@@ -481,7 +481,7 @@ HAVING COUNT(p.id) > 0
 ORDER BY receita_total DESC;"""
     },
     "csharp": {
-        "name": "C#", "icon": "💜", "color": "#c084fc", "category": "Backend",
+        "name": "C#", "icon": "💜", "color": "#68217A", "category": "Backend",
         "description": "Linguagem orientada a objetos da Microsoft para .NET.",
         "example_title": "Repository Pattern + ASP.NET Core",
         "example": """\
@@ -525,7 +525,7 @@ public class PedidoController(IRepository<Pedido> repo) : ControllerBase
 }"""
     },
     "dotnet": {
-        "name": ".NET", "icon": "🟣", "color": "#a855f7", "category": "Backend",
+        "name": ".NET", "icon": "🟣", "color": "#512BD4", "category": "Backend",
         "description": "Plataforma Microsoft para aplicações modernas e de alta performance.",
         "example_title": "Worker Service consumindo RabbitMQ",
         "example": """\
@@ -568,7 +568,7 @@ public sealed class PedidoWorker(
 }"""
     },
     "rabbitmq": {
-        "name": "RabbitMQ", "icon": "🐇", "color": "#fb923c", "category": "Messaging",
+        "name": "RabbitMQ", "icon": "🐇", "color": "#FF6600", "category": "Messaging",
         "description": "Message broker para comunicação assíncrona entre serviços.",
         "example_title": "Fanout Exchange — broadcast a múltiplos consumers",
         "example": """\
@@ -618,7 +618,7 @@ def consumir(servico: str, handler) -> None:
 # consumir("estoque-svc",  lambda e: print("Baixando estoque..."))"""
     },
     "redis": {
-        "name": "Redis", "icon": "🔴", "color": "#f87171", "category": "Cache",
+        "name": "Redis", "icon": "🔴", "color": "#DC382D", "category": "Cache",
         "description": "Store in-memory ultrarrápido para cache, sessão e pub/sub.",
         "example_title": "Cache decorator + Pub/Sub assíncrono",
         "example": """\
@@ -661,7 +661,7 @@ async def assinar(canal: str) -> None:
             print("📩", json.loads(msg["data"]))"""
     },
     "pandas": {
-        "name": "Pandas", "icon": "🐼", "color": "#34d399", "category": "Data Science",
+        "name": "Pandas", "icon": "🐼", "color": "#E70488", "category": "Data Science",
         "description": "Biblioteca Python para análise e manipulação de dados tabulares.",
         "example_title": "Análise exploratória + Pivot Table",
         "example": """\

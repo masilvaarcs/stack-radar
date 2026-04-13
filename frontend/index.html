@@ -318,12 +318,23 @@ html.transitioning *::after {
   /* pending state — dim */
   opacity: .35; filter: grayscale(.8);
 }
-.scard.ready { opacity: 1; filter: none; animation: card-in .4s ease both; }
-.scard.ready::before {
-  content: ''; position: absolute; top:0;left:0;right:0;height:1px;
-  background: linear-gradient(90deg,transparent,rgba(255,255,255,.08),transparent);
+.scard.ready {
+  opacity: 1; filter: none; animation: card-in .4s ease both;
+  border-left: 3px solid var(--sc, var(--amber));
+  background: color-mix(in srgb, var(--sc, var(--amber)) 6%, var(--surface));
 }
-.scard.ready:hover { transform: translateY(-3px); border-color: var(--bord2); box-shadow: 0 12px 40px var(--card-shadow); }
+.scard.ready::before {
+  content: ''; position: absolute; top:0;left:0;right:0;height:2px;
+  background: linear-gradient(90deg, var(--sc, var(--amber)), transparent 80%);
+  opacity: .5;
+}
+.scard.ready:hover {
+  transform: translateY(-3px);
+  border-color: var(--sc, var(--amber));
+  border-left-color: var(--sc, var(--amber));
+  background: color-mix(in srgb, var(--sc, var(--amber)) 10%, var(--surface));
+  box-shadow: 0 8px 30px color-mix(in srgb, var(--sc, var(--amber)) 20%, transparent);
+}
 .scard.selected {
   border-color: var(--sc,var(--amber));
   box-shadow: 0 0 0 1px var(--sc,var(--amber)), 0 12px 40px var(--card-shadow);
@@ -347,8 +358,9 @@ html.transitioning *::after {
 
 .cdot {
   position: absolute; top: .75rem; right: .75rem;
-  width: 7px; height: 7px; border-radius: 50%;
-  background: var(--sc,var(--amber)); opacity: .6;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--sc,var(--amber)); opacity: .8;
+  box-shadow: 0 0 8px var(--sc, var(--amber));
 }
 .scard.ready .cdot { animation: pulse-dot 2s ease-in-out infinite; }
 @keyframes pulse-dot { 0%,100%{transform:scale(1);opacity:.6} 50%{transform:scale(1.5);opacity:1} }
@@ -357,22 +369,30 @@ html.transitioning *::after {
   font-size: 1.65rem; margin-bottom: .45rem;
   width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
   border-radius: 12px;
-  background: color-mix(in srgb, var(--sc, var(--amber)) 12%, transparent);
-  box-shadow: 0 0 16px color-mix(in srgb, var(--sc, var(--amber)) 15%, transparent);
+  background: color-mix(in srgb, var(--sc, var(--amber)) 18%, transparent);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--sc, var(--amber)) 22%, transparent);
   transition: all .3s ease;
 }
 .scard.ready:hover .cicon {
-  box-shadow: 0 0 24px color-mix(in srgb, var(--sc, var(--amber)) 30%, transparent);
+  background: color-mix(in srgb, var(--sc, var(--amber)) 28%, transparent);
+  box-shadow: 0 0 32px color-mix(in srgb, var(--sc, var(--amber)) 40%, transparent);
 }
 .scard.ready::after {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-  background: linear-gradient(90deg, transparent, var(--sc, var(--amber)), transparent);
-  opacity: .6;
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--sc, var(--amber)) 40%, transparent);
+  opacity: .45;
 }
-.cname { font-weight: 700; font-size: .88rem; color: var(--text-h); margin-bottom: .15rem; }
+.cname {
+  font-weight: 700; font-size: .88rem; color: var(--text-h); margin-bottom: .15rem;
+}
+.scard.ready .cname {
+  background: linear-gradient(135deg, var(--text-h), color-mix(in srgb, var(--sc, var(--amber)) 50%, var(--text-h)));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 .ccat  {
   font-family: var(--mono); font-size: .6rem; text-transform: uppercase; letter-spacing: 1px;
-  color: var(--sc, var(--muted2)); opacity: .7;
+  color: var(--sc, var(--muted2)); opacity: .85; font-weight: 600;
 }
 
 /* ═══════════════════════════════════════════════════
@@ -668,7 +688,7 @@ footer { border-top: 1px solid var(--border); padding: 2.5rem 0 3rem; text-align
       <a class="flink p" href="https://masilvaarcs.github.io/portfolio-hub" target="_blank" rel="noopener">🖥 Portfólio</a>
       <a class="flink l" href="https://www.linkedin.com/in/marcosprogramador" target="_blank" rel="noopener">💼 LinkedIn</a>
     </div>
-    <div class="fcopy">stack-radar · fastapi · pika · rabbitmq · websocket · 2025</div>
+    <div class="fcopy">stack-radar · fastapi · pika · rabbitmq · websocket · 2026</div>
   </div>
 </footer>
 
