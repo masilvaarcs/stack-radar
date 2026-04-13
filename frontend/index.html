@@ -1093,6 +1093,7 @@ uzone.addEventListener('drop', async e => {
 
 async function processarPDF(file) {
   resetUI();
+  document.querySelectorAll('.demo-card').forEach(c => c.classList.remove('active'));
   log(`📋 Arquivo: ${file.name} (${(file.size/1024).toFixed(1)} KB)`, 'i');
 
   if (serverOnline) {
