@@ -321,7 +321,8 @@ html.transitioning *::after {
 .scard.ready {
   opacity: 1; filter: none; animation: card-in .4s ease both;
   border-left: 3px solid var(--sc, var(--amber));
-  background: color-mix(in srgb, var(--sc, var(--amber)) 6%, var(--surface));
+  background: color-mix(in srgb, var(--sc, var(--amber)) 8%, var(--surface));
+  border-top: 1px solid color-mix(in srgb, var(--sc, var(--amber)) 15%, transparent);
 }
 .scard.ready::before {
   content: ''; position: absolute; top:0;left:0;right:0;height:2px;
@@ -329,11 +330,12 @@ html.transitioning *::after {
   opacity: .5;
 }
 .scard.ready:hover {
-  transform: translateY(-3px);
+  transform: translateY(-4px) scale(1.02);
   border-color: var(--sc, var(--amber));
   border-left-color: var(--sc, var(--amber));
-  background: color-mix(in srgb, var(--sc, var(--amber)) 10%, var(--surface));
-  box-shadow: 0 8px 30px color-mix(in srgb, var(--sc, var(--amber)) 20%, transparent);
+  background: color-mix(in srgb, var(--sc, var(--amber)) 14%, var(--surface));
+  box-shadow: 0 8px 30px color-mix(in srgb, var(--sc, var(--amber)) 25%, transparent),
+              0 0 0 1px color-mix(in srgb, var(--sc, var(--amber)) 20%, transparent);
 }
 .scard.selected {
   border-color: var(--sc,var(--amber));
@@ -369,13 +371,18 @@ html.transitioning *::after {
   font-size: 1.65rem; margin-bottom: .45rem;
   width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
   border-radius: 12px;
-  background: color-mix(in srgb, var(--sc, var(--amber)) 18%, transparent);
-  box-shadow: 0 0 20px color-mix(in srgb, var(--sc, var(--amber)) 22%, transparent);
+  background: color-mix(in srgb, var(--sc, var(--amber)) 28%, transparent);
+  border: 1px solid color-mix(in srgb, var(--sc, var(--amber)) 25%, transparent);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--sc, var(--amber)) 30%, transparent),
+              inset 0 0 12px color-mix(in srgb, var(--sc, var(--amber)) 8%, transparent);
   transition: all .3s ease;
 }
 .scard.ready:hover .cicon {
-  background: color-mix(in srgb, var(--sc, var(--amber)) 28%, transparent);
-  box-shadow: 0 0 32px color-mix(in srgb, var(--sc, var(--amber)) 40%, transparent);
+  background: color-mix(in srgb, var(--sc, var(--amber)) 38%, transparent);
+  border-color: color-mix(in srgb, var(--sc, var(--amber)) 45%, transparent);
+  box-shadow: 0 0 36px color-mix(in srgb, var(--sc, var(--amber)) 45%, transparent),
+              inset 0 0 16px color-mix(in srgb, var(--sc, var(--amber)) 12%, transparent);
+  transform: scale(1.08);
 }
 .scard.ready::after {
   content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
@@ -1060,7 +1067,6 @@ async function pipelineDemo(comPDF = false, file = null) {
   totalStacks = stacksAll.length;
   processados = 0;
 
-  resetUI();
   activarNode('p-pdf', 'pc1');
   if (comPDF && file) log(`📋 PDF: ${file.name}`, 'i');
   await sleep(400);

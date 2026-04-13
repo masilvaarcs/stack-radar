@@ -139,6 +139,25 @@ class TestStackDBIntegrity:
         for sid, s in STACK_DB.items():
             assert s["category"] in known, f"{sid} has unknown category '{s['category']}'"
 
+    def test_no_empty_example_titles(self):
+        for sid, s in STACK_DB.items():
+            assert s["example_title"].strip(), f"{sid} has empty example_title"
+
+    def test_example_title_not_generic(self):
+        """example_title deve ser descritivo, não genérico."""
+        generic = {"exemplo", "example", "código", "code", "test"}
+        for sid, s in STACK_DB.items():
+            title_lower = s["example_title"].lower()
+            assert title_lower not in generic, \
+                f"{sid} has generic example_title: '{s['example_title']}'"
+
+    def test_examples_are_substantial(self):
+        """Cada exemplo deve ter pelo menos 5 linhas de código."""
+        for sid, s in STACK_DB.items():
+            lines = [l for l in s["example"].split("\n") if l.strip()]
+            assert len(lines) >= 5, \
+                f"{sid} example too short ({len(lines)} lines)"
+
 
 # ─────────────────────────────────────────────────────────────
 #  STACK DETECTION

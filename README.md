@@ -128,6 +128,19 @@ uvicorn main:app --reload --port 8000
 
 ---
 
+## 🎨 Features da UI
+
+- **Pipeline visual** — diagrama animado mostra cada etapa em tempo real (PDF → PyMuPDF → RabbitMQ → WebSocket → UI)
+- **Terminal live** — log completo do pipeline com timestamps e emojis coloridos
+- **Stacks grid** — cards coloridos com filtro por categoria (Backend, Frontend, DevOps, Database...)
+- **Code Viewer** — clique em qualquer stack para ver um exemplo de código real com syntax highlight
+- **💡 Você sabia?** — curiosidade histórica/técnica sobre cada tecnologia
+- **Modo demo** — funciona 100% offline, simulando o pipeline completo com 17 stacks
+- **Dark/Light theme** — toggle com transição suave e persistência
+- **Drag & drop** — arraste PDF diretamente na upload zone
+
+---
+
 ## 🐇 Como funciona o RabbitMQ
 
 ```python
@@ -178,7 +191,7 @@ def callback(ch, method, properties, body):
 stack-radar/
 ├── backend/
 │   ├── main.py              ← FastAPI + RabbitMQ + WebSocket
-│   ├── test_main.py         ← 122 testes unitários (pytest)
+│   ├── test_main.py         ← 132 testes unitários (pytest)
 │   ├── requirements.txt
 │   └── Dockerfile           ← build local
 ├── docs/
