@@ -23,3 +23,6 @@ rabbit_data/
 
 # Uploads temporários
 *.pdf
+
+# LinkedIn posts (temporários, não versionar)
+docs/LINKEDIN_POST.md
