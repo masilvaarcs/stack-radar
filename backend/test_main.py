@@ -1,6 +1,6 @@
 """
 Testes unitários do Stack Radar — backend.
-Cobre: health, stacks, stack/{id}, upload, detecção de stacks, curiosity, STACK_DB.
+Cobre: health, stacks, stack/{id}, upload, detecção de stacks, curiosity, STACK_DB, ATS.
 """
 import sys
 import os
@@ -15,7 +15,7 @@ sys.modules["pika"] = pika_mock
 
 # Ajusta path
 sys.path.insert(0, os.path.dirname(__file__))
-from main import app, STACK_DB, KEYWORDS, detectar_stacks
+from main import app, STACK_DB, KEYWORDS, ALL_STACKS, detectar_stacks, analisar_ats
 
 client = TestClient(app)
 
@@ -44,8 +44,8 @@ class TestStacksList:
         r = client.get("/stacks")
         assert r.status_code == 200
         data = r.json()
-        assert data["total"] == len(STACK_DB)
-        assert len(data["stacks"]) == len(STACK_DB)
+        assert data["total"] == len(ALL_STACKS)
+        assert len(data["stacks"]) == len(ALL_STACKS)
 
     def test_stacks_have_required_fields(self):
         data = client.get("/stacks").json()
@@ -56,9 +56,9 @@ class TestStacksList:
             assert "color" in s
             assert "category" in s
 
-    def test_stacks_total_is_17(self):
+    def test_stacks_total_gt_100(self):
         data = client.get("/stacks").json()
-        assert data["total"] == 17
+        assert data["total"] >= 100, f"Expected 100+ stacks from taxonomy, got {data['total']}"
 
 
 # ─────────────────────────────────────────────────────────────
@@ -189,13 +189,13 @@ class TestDetection:
         assert "redis" in ids
 
     def test_detect_nothing(self):
-        result = detectar_stacks("Sou formado em administração de empresas")
+        result = detectar_stacks("abcdef ghijkl mnopqr stuvwx")
         assert len(result) == 0
 
     def test_all_keywords_have_stack(self):
-        """Cada keyword em KEYWORDS deve mapear para um id existente no STACK_DB."""
+        """Cada keyword em KEYWORDS deve mapear para um id existente no ALL_STACKS."""
         for keyword_id in KEYWORDS:
-            assert keyword_id in STACK_DB, f"KEYWORDS '{keyword_id}' not in STACK_DB"
+            assert keyword_id in ALL_STACKS, f"KEYWORDS '{keyword_id}' not in ALL_STACKS"
 
     def test_detect_returns_name_and_icon(self):
         result = detectar_stacks("Python")
@@ -204,6 +204,36 @@ class TestDetection:
         assert "name" in s
         assert "icon" in s
         assert "color" in s
+
+    def test_detect_taxonomy_saude(self):
+        result = detectar_stacks("Experiência em Cardiologia e Telemedicina")
+        ids = [s["id"] for s in result]
+        assert "cardiologia" in ids
+        assert "telemedicina" in ids
+
+    def test_detect_taxonomy_marketing(self):
+        result = detectar_stacks("Trabalho com SEO e Google Ads")
+        ids = [s["id"] for s in result]
+        assert "seo" in ids
+        assert "google_ads" in ids
+
+    def test_detect_taxonomy_cloud(self):
+        result = detectar_stacks("Infraestrutura na AWS com Kubernetes")
+        ids = [s["id"] for s in result]
+        assert "aws" in ids
+        assert "kubernetes" in ids
+
+    def test_detect_taxonomy_design(self):
+        result = detectar_stacks("UI design com Figma e Photoshop")
+        ids = [s["id"] for s in result]
+        assert "figma" in ids
+        assert "photoshop" in ids
+
+    def test_detect_taxonomy_finance(self):
+        result = detectar_stacks("Excel avançado e SAP ERP")
+        ids = [s["id"] for s in result]
+        assert "excel" in ids
+        assert "sap" in ids
 
 
 # ─────────────────────────────────────────────────────────────
@@ -296,3 +326,127 @@ class TestSecurity:
         src = inspect.getsource(consumer_thread)
         assert "Erro interno no processamento" in src
         assert '"message": str(e)' not in src
+
+
+# ─────────────────────────────────────────────────────────────
+#  ATS ANALYSIS
+# ─────────────────────────────────────────────────────────────
+class TestATSAnalysis:
+    SAMPLE_CV = """
+    João Silva
+    joao@email.com | (11) 99999-0000
+    linkedin.com/in/joaosilva | github.com/joaosilva
+
+    Resumo
+    Desenvolvedor Full-Stack com 5 anos de experiência em Python, React e AWS.
+
+    Experiência Profissional
+    Desenvolveu APIs REST com FastAPI que processam 10.000 requests/dia.
+    Liderou equipe de 8 pessoas em projeto de migração para microserviços.
+    Otimizou consultas SQL reduzindo tempo de resposta em 40%.
+    Implementou CI/CD com GitHub Actions e Docker.
+
+    Formação Acadêmica
+    Ciência da Computação - USP (2018)
+
+    Competências
+    Python, FastAPI, React, TypeScript, Docker, PostgreSQL, AWS, Redis
+
+    Certificações
+    AWS Solutions Architect Associate
+    """
+
+    def test_ats_returns_score(self):
+        stacks = detectar_stacks(self.SAMPLE_CV)
+        ats = analisar_ats(self.SAMPLE_CV, stacks)
+        assert "score" in ats
+        assert 0 <= ats["score"] <= 100
+
+    def test_ats_returns_classificacao(self):
+        stacks = detectar_stacks(self.SAMPLE_CV)
+        ats = analisar_ats(self.SAMPLE_CV, stacks)
+        assert ats["classificacao"] in ("Excelente", "Bom", "Regular", "Precisa Melhorar")
+        assert ats["classificacao_cor"].startswith("#")
+
+    def test_ats_detects_sections(self):
+        stacks = detectar_stacks(self.SAMPLE_CV)
+        ats = analisar_ats(self.SAMPLE_CV, stacks)
+        secoes = ats["detalhes"]["secoes"]["encontradas"]
+        assert secoes["summary"]["found"] is True
+        assert secoes["experience"]["found"] is True
+        assert secoes["education"]["found"] is True
+        assert secoes["skills"]["found"] is True
+        assert secoes["certifications"]["found"] is True
+
+    def test_ats_detects_action_verbs(self):
+        stacks = detectar_stacks(self.SAMPLE_CV)
+        ats = analisar_ats(self.SAMPLE_CV, stacks)
+        verbos = ats["detalhes"]["verbos_acao"]
+        assert verbos["total"] >= 3
+        assert "desenvolveu" in verbos["encontrados"] or "implementou" in verbos["encontrados"]
+
+    def test_ats_detects_quantifiers(self):
+        stacks = detectar_stacks(self.SAMPLE_CV)
+        ats = analisar_ats(self.SAMPLE_CV, stacks)
+        quant = ats["detalhes"]["metricas_quantificaveis"]
+        assert quant["total"] >= 2
+
+    def test_ats_detects_contact(self):
+        stacks = detectar_stacks(self.SAMPLE_CV)
+        ats = analisar_ats(self.SAMPLE_CV, stacks)
+        contato = ats["detalhes"]["contato"]["encontrados"]
+        assert contato["email"] is True
+        assert contato["linkedin"] is True
+        assert contato["github"] is True
+
+    def test_ats_generates_suggestions(self):
+        bad_cv = "João Silva. Trabalho com coisas."
+        stacks = detectar_stacks(bad_cv)
+        ats = analisar_ats(bad_cv, stacks)
+        assert len(ats["sugestoes"]) >= 3
+        assert ats["score"] < 40
+
+    def test_ats_resumo_has_all_fields(self):
+        stacks = detectar_stacks(self.SAMPLE_CV)
+        ats = analisar_ats(self.SAMPLE_CV, stacks)
+        resumo = ats["resumo"]
+        assert "total_palavras" in resumo
+        assert "stacks_detectadas" in resumo
+        assert "secoes_encontradas" in resumo
+        assert "verbos_acao" in resumo
+
+    def test_ats_good_cv_scores_high(self):
+        stacks = detectar_stacks(self.SAMPLE_CV)
+        ats = analisar_ats(self.SAMPLE_CV, stacks)
+        assert ats["score"] >= 50, f"Good CV scored only {ats['score']}"
+
+
+# ─────────────────────────────────────────────────────────────
+#  TAXONOMY INTEGRITY
+# ─────────────────────────────────────────────────────────────
+class TestTaxonomyIntegrity:
+    def test_all_stacks_have_original_examples(self):
+        """Os 17 stacks originais ainda têm exemplos de código."""
+        for sid in STACK_DB:
+            assert sid in ALL_STACKS, f"{sid} missing from ALL_STACKS"
+            assert "example" in ALL_STACKS[sid], f"{sid} lost its example"
+
+    def test_taxonomy_covers_multiple_areas(self):
+        areas = set(s.get("area", "") for s in ALL_STACKS.values() if s.get("area"))
+        assert len(areas) >= 5, f"Expected 5+ areas, got {len(areas)}: {areas}"
+
+    def test_taxonomy_has_saude_stacks(self):
+        saude = [s for s in ALL_STACKS.values() if s.get("area") == "Saúde"]
+        assert len(saude) >= 10, f"Expected 10+ Saúde stacks, got {len(saude)}"
+
+    def test_taxonomy_has_educacao_stacks(self):
+        edu = [s for s in ALL_STACKS.values() if s.get("area") == "Educação"]
+        assert len(edu) >= 8, f"Expected 8+ Educação stacks, got {len(edu)}"
+
+    def test_taxonomy_stacks_have_min_fields(self):
+        """Todas stacks da taxonomia devem ter name, icon, color, category."""
+        for sid, info in ALL_STACKS.items():
+            assert info.get("name"), f"{sid} missing name"
+            assert info.get("icon"), f"{sid} missing icon"
+            assert info.get("color"), f"{sid} missing color"
+            assert info.get("category"), f"{sid} missing category"

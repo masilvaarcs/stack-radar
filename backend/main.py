@@ -722,40 +722,75 @@ print(pivot)"""
 }
 
 # ─────────────────────────────────────────────────────────────
+#  TAXONOMIA — carrega JSON e monta KEYWORDS + TAXONOMY_DB
+# ─────────────────────────────────────────────────────────────
+def _load_taxonomy() -> tuple[dict, dict]:
+    """Carrega stacks_taxonomy.json e retorna (keywords_map, taxonomy_db)."""
+    taxonomy_path = Path(__file__).parent.parent / "tabelas" / "stacks_taxonomy.json"
+    if not taxonomy_path.exists():
+        taxonomy_path = Path(__file__).parent / "tabelas" / "stacks_taxonomy.json"
+    if not taxonomy_path.exists():
+        log.warning("stacks_taxonomy.json não encontrado — usando apenas STACK_DB")
+        return {}, {}
+
+    with open(taxonomy_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    kw_map: dict[str, list[str]] = {}
+    tax_db: dict[str, dict] = {}
+
+    for area in data.get("areas", []):
+        area_name = area["area"]
+        area_icon = area.get("icon", "📦")
+        for cat in area.get("categories", []):
+            cat_name = cat["category"]
+            for stack in cat.get("stacks", []):
+                sid = stack["id"]
+                kw_map[sid] = stack.get("keywords", [])
+                tax_db[sid] = {
+                    "name": stack["name"],
+                    "icon": stack.get("icon", "📦"),
+                    "color": stack.get("color", "#888"),
+                    "category": cat_name,
+                    "area": area_name,
+                    "area_icon": area_icon,
+                    "description": stack.get("description", ""),
+                }
+    return kw_map, tax_db
+
+TAXONOMY_KEYWORDS, TAXONOMY_DB = _load_taxonomy()
+log.info(f"Taxonomia carregada: {len(TAXONOMY_DB)} stacks em {len(set(s.get('area','') for s in TAXONOMY_DB.values()))} áreas")
+
+# Mescla: STACK_DB (com exemplos) tem prioridade; TAXONOMY_DB preenche o resto
+ALL_STACKS: dict = {}
+for sid, info in TAXONOMY_DB.items():
+    ALL_STACKS[sid] = {**info}
+for sid, info in STACK_DB.items():
+    if sid in ALL_STACKS:
+        ALL_STACKS[sid].update(info)
+    else:
+        ALL_STACKS[sid] = {**info}
+
+# KEYWORDS = taxonomia + STACK_DB keys sem keyword no JSON
+KEYWORDS: dict[str, list[str]] = {**TAXONOMY_KEYWORDS}
+for sid in STACK_DB:
+    if sid not in KEYWORDS:
+        KEYWORDS[sid] = [sid]
+
+# ─────────────────────────────────────────────────────────────
 #  DETECÇÃO DE STACKS
 # ─────────────────────────────────────────────────────────────
-KEYWORDS: dict[str, list[str]] = {
-    "python":     ["python"],
-    "flask":      ["flask"],
-    "fastapi":    ["fastapi", "fast api"],
-    "django":     ["django"],
-    "react":      ["react", "reactjs", "react.js"],
-    "angular":    ["angular"],
-    "typescript": ["typescript"],
-    "javascript": ["javascript"],
-    "node":       ["node.js", "nodejs", "node js"],
-    "docker":     ["docker", "dockerfile", "docker-compose", "container"],
-    "postgresql": ["postgresql", "postgres"],
-    "sql":        ["mysql", "sqlite", "sql server", "t-sql", " sql "],
-    "csharp":     ["c#", "csharp", "c sharp"],
-    "dotnet":     [".net", "asp.net", "dotnet"],
-    "rabbitmq":   ["rabbitmq", "rabbit mq", "amqp"],
-    "redis":      ["redis"],
-    "pandas":     ["pandas", "numpy", "scikit-learn", "sklearn"],
-}
-
 def detectar_stacks(texto: str) -> list[dict]:
     texto_lower = texto.lower()
     encontradas, vistas = [], set()
     for stack_id, keywords in KEYWORDS.items():
         for kw in keywords:
-            # Usa word-boundary apenas quando kw começa/termina com char alfanumérico
             left  = r'\b' if kw[0].isalnum() else r'(?<!\w)'
             right = r'\b' if kw[-1].isalnum() else r'(?!\w)'
             padrao = left + re.escape(kw) + right
             if re.search(padrao, texto_lower) and stack_id not in vistas:
-                if stack_id in STACK_DB:
-                    encontradas.append({"id": stack_id, **STACK_DB[stack_id]})
+                if stack_id in ALL_STACKS:
+                    encontradas.append({"id": stack_id, **ALL_STACKS[stack_id]})
                     vistas.add(stack_id)
                     break
     return encontradas
@@ -767,6 +802,192 @@ def extrair_texto_pdf(conteudo: bytes) -> str:
         texto += pagina.get_text()
     doc.close()
     return texto
+
+# ─────────────────────────────────────────────────────────────
+#  ANÁLISE ATS (Applicant Tracking System)
+# ─────────────────────────────────────────────────────────────
+def _load_ats_config() -> dict:
+    taxonomy_path = Path(__file__).parent.parent / "tabelas" / "stacks_taxonomy.json"
+    if not taxonomy_path.exists():
+        taxonomy_path = Path(__file__).parent / "tabelas" / "stacks_taxonomy.json"
+    if taxonomy_path.exists():
+        with open(taxonomy_path, "r", encoding="utf-8") as f:
+            return json.load(f).get("ats_config", {})
+    return {}
+
+ATS_CONFIG = _load_ats_config()
+
+def analisar_ats(texto: str, stacks_encontradas: list[dict]) -> dict:
+    """Analisa o texto do CV e retorna métricas ATS."""
+    texto_lower = texto.lower()
+    linhas = texto.strip().split("\n")
+    palavras = texto.split()
+    total_palavras = len(palavras)
+
+    # 1. Seções detectadas
+    secoes_cfg = ATS_CONFIG.get("sections_expected", [])
+    secoes = {}
+    score_secoes = 0
+    total_peso_secoes = sum(s.get("weight", 0) for s in secoes_cfg)
+    for sec in secoes_cfg:
+        encontrada = any(
+            re.search(r'(?:^|\n)\s*' + re.escape(nome), texto_lower)
+            for nome in sec["names"]
+        )
+        secoes[sec["key"]] = {
+            "found": encontrada,
+            "weight": sec["weight"],
+            "names": sec["names"][:3],
+        }
+        if encontrada:
+            score_secoes += sec["weight"]
+
+    # 2. Verbos de ação
+    action_verbs = ATS_CONFIG.get("action_verbs", [])
+    verbos_encontrados = []
+    for v in action_verbs:
+        if re.search(r'\b' + re.escape(v) + r'\b', texto_lower):
+            verbos_encontrados.append(v)
+    score_verbos = min(100, len(verbos_encontrados) * 10)
+
+    # 3. Métricas quantificáveis
+    quant_patterns = ATS_CONFIG.get("quantifiers_patterns", [])
+    metricas_quantificaveis = []
+    for pat in quant_patterns:
+        matches = re.findall(pat, texto, re.IGNORECASE)
+        metricas_quantificaveis.extend(matches)
+    score_quantificaveis = min(100, len(metricas_quantificaveis) * 15)
+
+    # 4. Info de contato
+    contact_cfg = ATS_CONFIG.get("contact_patterns", {})
+    contato = {}
+    score_contato = 0
+    for key, pat in contact_cfg.items():
+        match = re.search(pat, texto, re.IGNORECASE)
+        contato[key] = bool(match)
+        if match:
+            score_contato += 20
+    score_contato = min(100, score_contato)
+
+    # 5. Comprimento do CV
+    if total_palavras < 150:
+        score_comprimento = 30
+        dica_comprimento = "Currículo muito curto. Adicione mais detalhes sobre experiência e projetos."
+    elif total_palavras < 300:
+        score_comprimento = 60
+        dica_comprimento = "Currículo um pouco curto. Considere expandir descrições de experiência."
+    elif total_palavras <= 800:
+        score_comprimento = 100
+        dica_comprimento = "Comprimento ideal para a maioria das vagas."
+    elif total_palavras <= 1200:
+        score_comprimento = 80
+        dica_comprimento = "CV um pouco longo. Considere priorizar as experiências mais relevantes."
+    else:
+        score_comprimento = 50
+        dica_comprimento = "CV muito extenso. Recrutadores gastam em média 7 segundos na triagem inicial."
+
+    # 6. Diversidade de áreas (stacks)
+    areas = set()
+    categorias = set()
+    for s in stacks_encontradas:
+        areas.add(s.get("area", s.get("category", "")))
+        categorias.add(s.get("category", ""))
+    score_stacks = min(100, len(stacks_encontradas) * 8)
+
+    # Score final ponderado
+    score_final = round(
+        (score_secoes / max(total_peso_secoes, 1)) * 100 * 0.30 +  # 30% seções
+        score_verbos * 0.15 +                                        # 15% verbos
+        score_quantificaveis * 0.15 +                                # 15% métricas
+        score_contato * 0.15 +                                       # 15% contato
+        score_comprimento * 0.10 +                                   # 10% comprimento
+        score_stacks * 0.15                                          # 15% stacks
+    )
+
+    # Sugestões de melhoria
+    sugestoes = []
+    for key, sec_info in secoes.items():
+        if not sec_info["found"]:
+            label = key.replace("_", " ").title()
+            sugestoes.append({
+                "tipo": "secao_ausente",
+                "prioridade": "alta" if sec_info["weight"] >= 15 else "media",
+                "mensagem": f"Seção '{label}' não encontrada. Adicione para melhorar a leitura por ATS.",
+                "impacto": sec_info["weight"],
+            })
+    if len(verbos_encontrados) < 5:
+        sugestoes.append({
+            "tipo": "verbos_acao",
+            "prioridade": "alta",
+            "mensagem": f"Apenas {len(verbos_encontrados)} verbos de ação encontrados. Use verbos como 'desenvolveu', 'implementou', 'liderou', 'otimizou' para descrever conquistas.",
+            "impacto": 15,
+        })
+    if len(metricas_quantificaveis) < 3:
+        sugestoes.append({
+            "tipo": "metricas",
+            "prioridade": "alta",
+            "mensagem": "Poucas métricas quantificáveis. Adicione números: '↑30% de performance', 'equipe de 8 pessoas', 'R$ 500K em economia'.",
+            "impacto": 15,
+        })
+    if not contato.get("email"):
+        sugestoes.append({
+            "tipo": "contato",
+            "prioridade": "alta",
+            "mensagem": "Email não encontrado. Todo currículo deve ter email de contato.",
+            "impacto": 20,
+        })
+    if not contato.get("linkedin"):
+        sugestoes.append({
+            "tipo": "contato",
+            "prioridade": "media",
+            "mensagem": "LinkedIn não encontrado. Adicione o link do seu perfil.",
+            "impacto": 10,
+        })
+    if len(stacks_encontradas) < 5:
+        sugestoes.append({
+            "tipo": "competencias",
+            "prioridade": "media",
+            "mensagem": f"Apenas {len(stacks_encontradas)} competências detectadas. Liste claramente suas skills técnicas e profissionais.",
+            "impacto": 10,
+        })
+
+    # Classificação ATS
+    if score_final >= 80:
+        classificacao = "Excelente"
+        classificacao_cor = "#27AE60"
+    elif score_final >= 60:
+        classificacao = "Bom"
+        classificacao_cor = "#F1C40F"
+    elif score_final >= 40:
+        classificacao = "Regular"
+        classificacao_cor = "#E67E22"
+    else:
+        classificacao = "Precisa Melhorar"
+        classificacao_cor = "#E74C3C"
+
+    return {
+        "score": score_final,
+        "classificacao": classificacao,
+        "classificacao_cor": classificacao_cor,
+        "detalhes": {
+            "secoes": {"score": round((score_secoes / max(total_peso_secoes, 1)) * 100), "encontradas": secoes, "peso": "30%"},
+            "verbos_acao": {"score": score_verbos, "encontrados": verbos_encontrados[:15], "total": len(verbos_encontrados), "peso": "15%"},
+            "metricas_quantificaveis": {"score": score_quantificaveis, "encontradas": metricas_quantificaveis[:10], "total": len(metricas_quantificaveis), "peso": "15%"},
+            "contato": {"score": score_contato, "encontrados": contato, "peso": "15%"},
+            "comprimento": {"score": score_comprimento, "total_palavras": total_palavras, "dica": dica_comprimento, "peso": "10%"},
+            "competencias": {"score": score_stacks, "total": len(stacks_encontradas), "areas": list(areas), "categorias": list(categorias), "peso": "15%"},
+        },
+        "sugestoes": sorted(sugestoes, key=lambda s: s["impacto"], reverse=True),
+        "resumo": {
+            "total_palavras": total_palavras,
+            "total_linhas": len(linhas),
+            "stacks_detectadas": len(stacks_encontradas),
+            "secoes_encontradas": sum(1 for s in secoes.values() if s["found"]),
+            "secoes_esperadas": len(secoes),
+            "verbos_acao": len(verbos_encontrados),
+            "metricas_numericas": len(metricas_quantificaveis),
+        }
+    }
 
 # ─────────────────────────────────────────────────────────────
 #  CONEXÃO RABBITMQ
@@ -854,7 +1075,7 @@ def consumer_thread(session_id: str, total: int, loop: asyncio.AbstractEventLoop
                 return
 
             stack_id = msg["stack_id"]
-            stack    = STACK_DB.get(stack_id, {})
+            stack    = ALL_STACKS.get(stack_id, {})
             processados += 1
 
             evento = {
@@ -949,12 +1170,14 @@ async def health():
 async def listar_stacks():
     """Retorna todas as stacks disponíveis no banco."""
     return {
-        "total": len(STACK_DB),
+        "total": len(ALL_STACKS),
         "stacks": [
             {"id": k, "name": v["name"], "icon": v["icon"],
              "color": v["color"], "category": v["category"],
-             "description": v["description"]}
-            for k, v in STACK_DB.items()
+             "area": v.get("area", ""),
+             "description": v.get("description", ""),
+             "has_example": "example" in v}
+            for k, v in ALL_STACKS.items()
         ]
     }
 
@@ -985,7 +1208,10 @@ async def upload_pdf(pdf: UploadFile = File(...)):
     # Detecta stacks
     stacks = detectar_stacks(texto)
     if not stacks:
-        raise HTTPException(404, "Nenhuma stack tecnológica identificada no PDF")
+        raise HTTPException(404, "Nenhuma competência identificada no PDF")
+
+    # Análise ATS
+    ats = analisar_ats(texto, stacks)
 
     # Gera session_id único para esta análise
     session_id = str(uuid.uuid4())
@@ -993,7 +1219,8 @@ async def upload_pdf(pdf: UploadFile = File(...)):
     return {
         "session_id": session_id,
         "encontradas": len(stacks),
-        "stacks": [{"id": s["id"], "name": s["name"], "icon": s["icon"]} for s in stacks],
+        "stacks": [{"id": s["id"], "name": s["name"], "icon": s["icon"], "area": s.get("area", "")} for s in stacks],
+        "ats": ats,
     }
 
 def _validate_session_id(session_id: str) -> None:
@@ -1058,6 +1285,6 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
 @app.get("/stack/{stack_id}")
 async def get_stack(stack_id: str):
     """Retorna exemplo completo de uma stack específica."""
-    if stack_id not in STACK_DB:
+    if stack_id not in ALL_STACKS:
         raise HTTPException(404, "Stack não encontrada")
-    return STACK_DB[stack_id]
+    return ALL_STACKS[stack_id]

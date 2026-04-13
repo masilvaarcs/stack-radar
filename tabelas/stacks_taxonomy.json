@@ -1,0 +1,1669 @@
+{
+  "version": "2.0",
+  "updated": "2026-04-13",
+  "areas": [
+    {
+      "area": "Tecnologia da Informação",
+      "icon": "⚙️",
+      "categories": [
+        {
+          "category": "Linguagens/Frameworks",
+          "stacks": [
+            {
+              "id": "python",
+              "name": "Python",
+              "icon": "🐍",
+              "color": "#3776AB",
+              "keywords": ["python"]
+            },
+            {
+              "id": "javascript",
+              "name": "JavaScript",
+              "icon": "🟡",
+              "color": "#F7DF1E",
+              "keywords": ["javascript"]
+            },
+            {
+              "id": "typescript",
+              "name": "TypeScript",
+              "icon": "🔷",
+              "color": "#3178C6",
+              "keywords": ["typescript"]
+            },
+            {
+              "id": "java",
+              "name": "Java",
+              "icon": "☕",
+              "color": "#ED8B00",
+              "keywords": ["java", "jdk", "jvm", "spring boot", "spring framework"]
+            },
+            {
+              "id": "csharp",
+              "name": "C#",
+              "icon": "💜",
+              "color": "#68217A",
+              "keywords": ["c#", "csharp", "c sharp"]
+            },
+            {
+              "id": "go",
+              "name": "Go",
+              "icon": "🔵",
+              "color": "#00ADD8",
+              "keywords": ["golang", "go lang"]
+            },
+            {
+              "id": "rust",
+              "name": "Rust",
+              "icon": "🦀",
+              "color": "#DEA584",
+              "keywords": ["rust", "rustlang", "cargo"]
+            },
+            {
+              "id": "php",
+              "name": "PHP",
+              "icon": "🐘",
+              "color": "#777BB4",
+              "keywords": ["php", "laravel", "symfony", "codeigniter"]
+            },
+            {
+              "id": "ruby",
+              "name": "Ruby",
+              "icon": "💎",
+              "color": "#CC342D",
+              "keywords": ["ruby", "ruby on rails", "rails"]
+            },
+            {
+              "id": "swift",
+              "name": "Swift",
+              "icon": "🍎",
+              "color": "#FA7343",
+              "keywords": ["swift", "swiftui", "uikit"]
+            },
+            {
+              "id": "kotlin",
+              "name": "Kotlin",
+              "icon": "🟠",
+              "color": "#7F52FF",
+              "keywords": ["kotlin"]
+            },
+            {
+              "id": "dart",
+              "name": "Dart",
+              "icon": "🎯",
+              "color": "#0175C2",
+              "keywords": ["dart", "flutter"]
+            },
+            {
+              "id": "scala",
+              "name": "Scala",
+              "icon": "🔶",
+              "color": "#DC322F",
+              "keywords": ["scala", "akka", "play framework"]
+            },
+            {
+              "id": "r_lang",
+              "name": "R",
+              "icon": "📊",
+              "color": "#276DC3",
+              "keywords": ["linguagem r", "rstudio", "r studio", "tidyverse", "ggplot"]
+            },
+            {
+              "id": "cplusplus",
+              "name": "C++",
+              "icon": "⚡",
+              "color": "#00599C",
+              "keywords": ["c++", "cplusplus"]
+            },
+            {
+              "id": "c_lang",
+              "name": "C",
+              "icon": "🔧",
+              "color": "#A8B9CC",
+              "keywords": ["linguagem c", "programação c"]
+            },
+            {
+              "id": "elixir",
+              "name": "Elixir",
+              "icon": "💧",
+              "color": "#6E4A7E",
+              "keywords": ["elixir", "phoenix framework", "erlang"]
+            },
+            {
+              "id": "lua",
+              "name": "Lua",
+              "icon": "🌙",
+              "color": "#000080",
+              "keywords": ["lua"]
+            },
+            {
+              "id": "perl",
+              "name": "Perl",
+              "icon": "🐪",
+              "color": "#39457E",
+              "keywords": ["perl"]
+            },
+            {
+              "id": "haskell",
+              "name": "Haskell",
+              "icon": "λ",
+              "color": "#5D4F85",
+              "keywords": ["haskell"]
+            },
+            {
+              "id": "clojure",
+              "name": "Clojure",
+              "icon": "🔗",
+              "color": "#5881D8",
+              "keywords": ["clojure", "clojurescript"]
+            }
+          ]
+        },
+        {
+          "category": "Frontend",
+          "stacks": [
+            {
+              "id": "react",
+              "name": "React",
+              "icon": "⚛️",
+              "color": "#61DAFB",
+              "keywords": ["react", "reactjs", "react.js", "react native"]
+            },
+            {
+              "id": "angular",
+              "name": "Angular",
+              "icon": "🔺",
+              "color": "#DD0031",
+              "keywords": ["angular"]
+            },
+            {
+              "id": "vue",
+              "name": "Vue.js",
+              "icon": "💚",
+              "color": "#4FC08D",
+              "keywords": ["vue", "vuejs", "vue.js", "nuxt", "nuxtjs"]
+            },
+            {
+              "id": "svelte",
+              "name": "Svelte",
+              "icon": "🔥",
+              "color": "#FF3E00",
+              "keywords": ["svelte", "sveltekit"]
+            },
+            {
+              "id": "nextjs",
+              "name": "Next.js",
+              "icon": "▲",
+              "color": "#000000",
+              "keywords": ["next.js", "nextjs"]
+            },
+            {
+              "id": "html_css",
+              "name": "HTML/CSS",
+              "icon": "🌐",
+              "color": "#E34F26",
+              "keywords": ["html", "css", "html5", "css3"]
+            },
+            {
+              "id": "sass",
+              "name": "Sass/SCSS",
+              "icon": "🎨",
+              "color": "#CC6699",
+              "keywords": ["sass", "scss"]
+            },
+            {
+              "id": "tailwind",
+              "name": "Tailwind CSS",
+              "icon": "🌊",
+              "color": "#06B6D4",
+              "keywords": ["tailwind", "tailwindcss"]
+            },
+            {
+              "id": "bootstrap",
+              "name": "Bootstrap",
+              "icon": "🅱️",
+              "color": "#7952B3",
+              "keywords": ["bootstrap"]
+            },
+            {
+              "id": "jquery",
+              "name": "jQuery",
+              "icon": "📜",
+              "color": "#0769AD",
+              "keywords": ["jquery"]
+            },
+            {
+              "id": "webpack",
+              "name": "Webpack",
+              "icon": "📦",
+              "color": "#8DD6F9",
+              "keywords": ["webpack"]
+            },
+            {
+              "id": "vite",
+              "name": "Vite",
+              "icon": "⚡",
+              "color": "#646CFF",
+              "keywords": ["vite", "vitejs"]
+            },
+            {
+              "id": "flutter",
+              "name": "Flutter",
+              "icon": "🦋",
+              "color": "#02569B",
+              "keywords": ["flutter"]
+            },
+            {
+              "id": "react_native",
+              "name": "React Native",
+              "icon": "📱",
+              "color": "#61DAFB",
+              "keywords": ["react native"]
+            },
+            {
+              "id": "electron",
+              "name": "Electron",
+              "icon": "🖥️",
+              "color": "#47848F",
+              "keywords": ["electron", "electronjs"]
+            }
+          ]
+        },
+        {
+          "category": "Backend",
+          "stacks": [
+            {
+              "id": "node",
+              "name": "Node.js",
+              "icon": "🟢",
+              "color": "#339933",
+              "keywords": ["node.js", "nodejs", "node js"]
+            },
+            {
+              "id": "fastapi",
+              "name": "FastAPI",
+              "icon": "⚡",
+              "color": "#009688",
+              "keywords": ["fastapi", "fast api"]
+            },
+            {
+              "id": "flask",
+              "name": "Flask",
+              "icon": "🌶️",
+              "color": "#44b78b",
+              "keywords": ["flask"]
+            },
+            {
+              "id": "django",
+              "name": "Django",
+              "icon": "🎸",
+              "color": "#44B78B",
+              "keywords": ["django"]
+            },
+            {
+              "id": "dotnet",
+              "name": ".NET",
+              "icon": "🟣",
+              "color": "#512BD4",
+              "keywords": [".net", "asp.net", "dotnet", "blazor"]
+            },
+            {
+              "id": "spring",
+              "name": "Spring",
+              "icon": "🌱",
+              "color": "#6DB33F",
+              "keywords": ["spring", "spring boot", "spring framework"]
+            },
+            {
+              "id": "express",
+              "name": "Express.js",
+              "icon": "🚂",
+              "color": "#000000",
+              "keywords": ["express", "expressjs"]
+            },
+            {
+              "id": "nestjs",
+              "name": "NestJS",
+              "icon": "🐱",
+              "color": "#E0234E",
+              "keywords": ["nestjs", "nest.js"]
+            },
+            {
+              "id": "graphql",
+              "name": "GraphQL",
+              "icon": "◈",
+              "color": "#E10098",
+              "keywords": ["graphql"]
+            },
+            {
+              "id": "grpc",
+              "name": "gRPC",
+              "icon": "📡",
+              "color": "#244C5A",
+              "keywords": ["grpc"]
+            },
+            {
+              "id": "nginx",
+              "name": "Nginx",
+              "icon": "🌐",
+              "color": "#009639",
+              "keywords": ["nginx"]
+            },
+            {
+              "id": "apache",
+              "name": "Apache",
+              "icon": "🪶",
+              "color": "#D22128",
+              "keywords": ["apache http", "apache server", "apache tomcat"]
+            }
+          ]
+        },
+        {
+          "category": "Bancos de Dados",
+          "stacks": [
+            {
+              "id": "postgresql",
+              "name": "PostgreSQL",
+              "icon": "🐘",
+              "color": "#336791",
+              "keywords": ["postgresql", "postgres"]
+            },
+            {
+              "id": "mysql",
+              "name": "MySQL",
+              "icon": "🐬",
+              "color": "#4479A1",
+              "keywords": ["mysql"]
+            },
+            {
+              "id": "sql",
+              "name": "SQL",
+              "icon": "🗄️",
+              "color": "#E38C00",
+              "keywords": ["sql server", "t-sql", "sqlite", " sql "]
+            },
+            {
+              "id": "mongodb",
+              "name": "MongoDB",
+              "icon": "🍃",
+              "color": "#47A248",
+              "keywords": ["mongodb", "mongo"]
+            },
+            {
+              "id": "redis",
+              "name": "Redis",
+              "icon": "🔴",
+              "color": "#DC382D",
+              "keywords": ["redis"]
+            },
+            {
+              "id": "oracle_db",
+              "name": "Oracle DB",
+              "icon": "🔶",
+              "color": "#F80000",
+              "keywords": ["oracle", "pl/sql", "oracle database"]
+            },
+            {
+              "id": "cassandra",
+              "name": "Cassandra",
+              "icon": "👁️",
+              "color": "#1287B1",
+              "keywords": ["cassandra"]
+            },
+            {
+              "id": "dynamodb",
+              "name": "DynamoDB",
+              "icon": "⚡",
+              "color": "#4053D6",
+              "keywords": ["dynamodb"]
+            },
+            {
+              "id": "elasticsearch",
+              "name": "Elasticsearch",
+              "icon": "🔍",
+              "color": "#005571",
+              "keywords": ["elasticsearch", "elastic search", "kibana", "elk stack"]
+            },
+            {
+              "id": "firebase",
+              "name": "Firebase",
+              "icon": "🔥",
+              "color": "#FFCA28",
+              "keywords": ["firebase", "firestore"]
+            },
+            {
+              "id": "neo4j",
+              "name": "Neo4j",
+              "icon": "🔗",
+              "color": "#008CC1",
+              "keywords": ["neo4j", "graph database"]
+            }
+          ]
+        },
+        {
+          "category": "DevOps",
+          "stacks": [
+            {
+              "id": "docker",
+              "name": "Docker",
+              "icon": "🐳",
+              "color": "#2496ED",
+              "keywords": ["docker", "dockerfile", "docker-compose", "container"]
+            },
+            {
+              "id": "kubernetes",
+              "name": "Kubernetes",
+              "icon": "☸️",
+              "color": "#326CE5",
+              "keywords": ["kubernetes", "k8s"]
+            },
+            {
+              "id": "jenkins",
+              "name": "Jenkins",
+              "icon": "🤖",
+              "color": "#D24939",
+              "keywords": ["jenkins"]
+            },
+            {
+              "id": "terraform",
+              "name": "Terraform",
+              "icon": "🏗️",
+              "color": "#7B42BC",
+              "keywords": ["terraform", "iac", "infrastructure as code"]
+            },
+            {
+              "id": "ansible",
+              "name": "Ansible",
+              "icon": "⚙️",
+              "color": "#EE0000",
+              "keywords": ["ansible"]
+            },
+            {
+              "id": "github_actions",
+              "name": "GitHub Actions",
+              "icon": "🔄",
+              "color": "#2088FF",
+              "keywords": ["github actions", "ci/cd"]
+            },
+            {
+              "id": "gitlab_ci",
+              "name": "GitLab CI",
+              "icon": "🦊",
+              "color": "#FC6D26",
+              "keywords": ["gitlab ci", "gitlab"]
+            },
+            {
+              "id": "prometheus",
+              "name": "Prometheus",
+              "icon": "📈",
+              "color": "#E6522C",
+              "keywords": ["prometheus"]
+            },
+            {
+              "id": "grafana",
+              "name": "Grafana",
+              "icon": "📊",
+              "color": "#F46800",
+              "keywords": ["grafana"]
+            },
+            {
+              "id": "linux",
+              "name": "Linux",
+              "icon": "🐧",
+              "color": "#FCC624",
+              "keywords": ["linux", "ubuntu", "centos", "debian", "red hat"]
+            },
+            {
+              "id": "git",
+              "name": "Git",
+              "icon": "🔀",
+              "color": "#F05032",
+              "keywords": ["git", "github", "bitbucket"]
+            },
+            {
+              "id": "azure_devops",
+              "name": "Azure DevOps",
+              "icon": "🔷",
+              "color": "#0078D7",
+              "keywords": ["azure devops", "azure pipelines"]
+            }
+          ]
+        },
+        {
+          "category": "Cloud",
+          "stacks": [
+            {
+              "id": "aws",
+              "name": "AWS",
+              "icon": "☁️",
+              "color": "#FF9900",
+              "keywords": ["aws", "amazon web services", "ec2", "s3", "lambda"]
+            },
+            {
+              "id": "azure",
+              "name": "Azure",
+              "icon": "🔷",
+              "color": "#0089D6",
+              "keywords": ["azure", "microsoft azure"]
+            },
+            {
+              "id": "gcp",
+              "name": "Google Cloud",
+              "icon": "🌈",
+              "color": "#4285F4",
+              "keywords": ["google cloud", "gcp", "bigquery"]
+            },
+            {
+              "id": "heroku",
+              "name": "Heroku",
+              "icon": "🟪",
+              "color": "#430098",
+              "keywords": ["heroku"]
+            },
+            {
+              "id": "vercel",
+              "name": "Vercel",
+              "icon": "▲",
+              "color": "#000000",
+              "keywords": ["vercel"]
+            },
+            {
+              "id": "railway",
+              "name": "Railway",
+              "icon": "🚂",
+              "color": "#0B0D0E",
+              "keywords": ["railway"]
+            },
+            {
+              "id": "cloudflare",
+              "name": "Cloudflare",
+              "icon": "🛡️",
+              "color": "#F38020",
+              "keywords": ["cloudflare"]
+            }
+          ]
+        },
+        {
+          "category": "Messaging/Streaming",
+          "stacks": [
+            {
+              "id": "rabbitmq",
+              "name": "RabbitMQ",
+              "icon": "🐇",
+              "color": "#FF6600",
+              "keywords": ["rabbitmq", "rabbit mq", "amqp"]
+            },
+            {
+              "id": "kafka",
+              "name": "Apache Kafka",
+              "icon": "📨",
+              "color": "#231F20",
+              "keywords": ["kafka", "apache kafka"]
+            },
+            {
+              "id": "celery",
+              "name": "Celery",
+              "icon": "🥬",
+              "color": "#37814A",
+              "keywords": ["celery"]
+            },
+            {
+              "id": "sqs",
+              "name": "Amazon SQS",
+              "icon": "📬",
+              "color": "#FF9900",
+              "keywords": ["sqs", "amazon sqs"]
+            }
+          ]
+        },
+        {
+          "category": "Data Science/ML",
+          "stacks": [
+            {
+              "id": "pandas",
+              "name": "Pandas",
+              "icon": "🐼",
+              "color": "#E70488",
+              "keywords": ["pandas"]
+            },
+            {
+              "id": "numpy",
+              "name": "NumPy",
+              "icon": "🔢",
+              "color": "#013243",
+              "keywords": ["numpy"]
+            },
+            {
+              "id": "scikit_learn",
+              "name": "Scikit-Learn",
+              "icon": "🧠",
+              "color": "#F7931E",
+              "keywords": ["scikit-learn", "sklearn", "scikit learn"]
+            },
+            {
+              "id": "tensorflow",
+              "name": "TensorFlow",
+              "icon": "🧮",
+              "color": "#FF6F00",
+              "keywords": ["tensorflow"]
+            },
+            {
+              "id": "pytorch",
+              "name": "PyTorch",
+              "icon": "🔥",
+              "color": "#EE4C2C",
+              "keywords": ["pytorch"]
+            },
+            {
+              "id": "spark",
+              "name": "Apache Spark",
+              "icon": "⚡",
+              "color": "#E25A1C",
+              "keywords": ["apache spark", "pyspark", "spark"]
+            },
+            {
+              "id": "jupyter",
+              "name": "Jupyter",
+              "icon": "📓",
+              "color": "#F37626",
+              "keywords": ["jupyter", "jupyter notebook"]
+            },
+            {
+              "id": "power_bi",
+              "name": "Power BI",
+              "icon": "📊",
+              "color": "#F2C811",
+              "keywords": ["power bi", "powerbi"]
+            },
+            {
+              "id": "tableau",
+              "name": "Tableau",
+              "icon": "📉",
+              "color": "#E97627",
+              "keywords": ["tableau"]
+            },
+            {
+              "id": "chatgpt_ai",
+              "name": "IA Generativa",
+              "icon": "🤖",
+              "color": "#10A37F",
+              "keywords": ["chatgpt", "openai", "gpt-4", "inteligência artificial", "machine learning", "deep learning", "llm", "ia generativa"]
+            },
+            {
+              "id": "mlops",
+              "name": "MLOps",
+              "icon": "🔄",
+              "color": "#FF6347",
+              "keywords": ["mlops", "mlflow", "kubeflow"]
+            }
+          ]
+        },
+        {
+          "category": "Segurança",
+          "stacks": [
+            {
+              "id": "cybersecurity",
+              "name": "Cibersegurança",
+              "icon": "🔐",
+              "color": "#2D2D2D",
+              "keywords": ["cibersegurança", "cybersecurity", "pentest", "penetration testing"]
+            },
+            {
+              "id": "owasp",
+              "name": "OWASP",
+              "icon": "🛡️",
+              "color": "#3C873A",
+              "keywords": ["owasp"]
+            },
+            {
+              "id": "soc",
+              "name": "SOC/SIEM",
+              "icon": "🔍",
+              "color": "#1A1A2E",
+              "keywords": ["soc", "siem", "splunk", "qradar"]
+            }
+          ]
+        },
+        {
+          "category": "Testes",
+          "stacks": [
+            {
+              "id": "selenium",
+              "name": "Selenium",
+              "icon": "🧪",
+              "color": "#43B02A",
+              "keywords": ["selenium"]
+            },
+            {
+              "id": "cypress",
+              "name": "Cypress",
+              "icon": "🌲",
+              "color": "#17202C",
+              "keywords": ["cypress"]
+            },
+            {
+              "id": "jest",
+              "name": "Jest",
+              "icon": "🃏",
+              "color": "#C21325",
+              "keywords": ["jest"]
+            },
+            {
+              "id": "pytest",
+              "name": "Pytest",
+              "icon": "🐍",
+              "color": "#0A9EDC",
+              "keywords": ["pytest"]
+            }
+          ]
+        },
+        {
+          "category": "Mobile",
+          "stacks": [
+            {
+              "id": "android",
+              "name": "Android",
+              "icon": "🤖",
+              "color": "#3DDC84",
+              "keywords": ["android", "android studio"]
+            },
+            {
+              "id": "ios",
+              "name": "iOS",
+              "icon": "🍎",
+              "color": "#000000",
+              "keywords": ["ios", "xcode"]
+            },
+            {
+              "id": "xamarin",
+              "name": "Xamarin",
+              "icon": "📱",
+              "color": "#3498DB",
+              "keywords": ["xamarin"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "area": "Saúde",
+      "icon": "🏥",
+      "categories": [
+        {
+          "category": "Áreas Clínicas",
+          "stacks": [
+            {
+              "id": "pediatria",
+              "name": "Pediatria",
+              "icon": "👶",
+              "color": "#FF9AA2",
+              "keywords": ["pediatria", "pediatra"]
+            },
+            {
+              "id": "cardiologia",
+              "name": "Cardiologia",
+              "icon": "❤️",
+              "color": "#FF6B6B",
+              "keywords": ["cardiologia", "cardiologista", "cardio"]
+            },
+            {
+              "id": "dermatologia",
+              "name": "Dermatologia",
+              "icon": "🩺",
+              "color": "#FFDAC1",
+              "keywords": ["dermatologia", "dermatologista"]
+            },
+            {
+              "id": "ortopedia",
+              "name": "Ortopedia",
+              "icon": "🦴",
+              "color": "#B5EAD7",
+              "keywords": ["ortopedia", "ortopedista"]
+            },
+            {
+              "id": "neurologia",
+              "name": "Neurologia",
+              "icon": "🧠",
+              "color": "#C7CEEA",
+              "keywords": ["neurologia", "neurologista", "neurociência"]
+            },
+            {
+              "id": "psiquiatria",
+              "name": "Psiquiatria",
+              "icon": "🧩",
+              "color": "#9B59B6",
+              "keywords": ["psiquiatria", "psiquiatra"]
+            },
+            {
+              "id": "oncologia",
+              "name": "Oncologia",
+              "icon": "🎗️",
+              "color": "#FF69B4",
+              "keywords": ["oncologia", "oncologista"]
+            },
+            {
+              "id": "ginecologia",
+              "name": "Ginecologia",
+              "icon": "🌸",
+              "color": "#FFB6C1",
+              "keywords": ["ginecologia", "ginecologista", "obstetrícia"]
+            },
+            {
+              "id": "geriatria",
+              "name": "Geriatria",
+              "icon": "👴",
+              "color": "#DDA0DD",
+              "keywords": ["geriatria", "geriatra"]
+            },
+            {
+              "id": "enfermagem",
+              "name": "Enfermagem",
+              "icon": "💉",
+              "color": "#48C9B0",
+              "keywords": ["enfermagem", "enfermeiro", "enfermeira"]
+            },
+            {
+              "id": "fisioterapia",
+              "name": "Fisioterapia",
+              "icon": "🏋️",
+              "color": "#82E0AA",
+              "keywords": ["fisioterapia", "fisioterapeuta"]
+            },
+            {
+              "id": "nutricao",
+              "name": "Nutrição",
+              "icon": "🍎",
+              "color": "#7DCEA0",
+              "keywords": ["nutrição", "nutricionista"]
+            },
+            {
+              "id": "farmacia",
+              "name": "Farmácia",
+              "icon": "💊",
+              "color": "#5DADE2",
+              "keywords": ["farmácia", "farmacêutico", "farmacologia"]
+            },
+            {
+              "id": "odontologia",
+              "name": "Odontologia",
+              "icon": "🦷",
+              "color": "#AED6F1",
+              "keywords": ["odontologia", "odontólogo", "dentista"]
+            },
+            {
+              "id": "psicologia",
+              "name": "Psicologia",
+              "icon": "🧠",
+              "color": "#BB8FCE",
+              "keywords": ["psicologia", "psicólogo", "psicóloga", "terapia cognitiva"]
+            }
+          ]
+        },
+        {
+          "category": "Técnicas/Procedimentos",
+          "stacks": [
+            {
+              "id": "cirurgia",
+              "name": "Cirurgia",
+              "icon": "🔪",
+              "color": "#E74C3C",
+              "keywords": ["cirurgia", "cirurgião", "cirúrgica"]
+            },
+            {
+              "id": "endoscopia",
+              "name": "Endoscopia",
+              "icon": "🔬",
+              "color": "#3498DB",
+              "keywords": ["endoscopia"]
+            },
+            {
+              "id": "radiologia",
+              "name": "Radiologia",
+              "icon": "☢️",
+              "color": "#F39C12",
+              "keywords": ["radiologia", "raio-x", "raio x", "tomografia", "ressonância"]
+            },
+            {
+              "id": "laboratorio",
+              "name": "Análises Clínicas",
+              "icon": "🧫",
+              "color": "#1ABC9C",
+              "keywords": ["análises clínicas", "laboratório", "hemograma", "bioquímica"]
+            }
+          ]
+        },
+        {
+          "category": "Equipamentos",
+          "stacks": [
+            {
+              "id": "ultrassom",
+              "name": "Ultrassom",
+              "icon": "📡",
+              "color": "#5B2C6F",
+              "keywords": ["ultrassom", "ultrassonografia", "ecografia"]
+            },
+            {
+              "id": "ressonancia",
+              "name": "Ressonância Magnética",
+              "icon": "🧲",
+              "color": "#2E86C1",
+              "keywords": ["ressonância magnética", "rmn"]
+            },
+            {
+              "id": "ecg",
+              "name": "ECG",
+              "icon": "💓",
+              "color": "#E74C3C",
+              "keywords": ["ecg", "eletrocardiograma", "eletrocardiografia"]
+            }
+          ]
+        },
+        {
+          "category": "Sistemas",
+          "stacks": [
+            {
+              "id": "prontuario",
+              "name": "Prontuário Eletrônico",
+              "icon": "📋",
+              "color": "#27AE60",
+              "keywords": ["prontuário eletrônico", "pep", "prontuário", "ehr", "emr"]
+            },
+            {
+              "id": "telemedicina",
+              "name": "Telemedicina",
+              "icon": "🖥️",
+              "color": "#2980B9",
+              "keywords": ["telemedicina", "telessaúde", "teleconsulta"]
+            },
+            {
+              "id": "saude_publica",
+              "name": "Saúde Pública",
+              "icon": "🏛️",
+              "color": "#16A085",
+              "keywords": ["saúde pública", "sus", "epidemiologia", "vigilância sanitária"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "area": "Educação",
+      "icon": "🎓",
+      "categories": [
+        {
+          "category": "Disciplinas",
+          "stacks": [
+            {
+              "id": "matematica",
+              "name": "Matemática",
+              "icon": "🔢",
+              "color": "#3498DB",
+              "keywords": ["matemática", "cálculo", "álgebra", "estatística"]
+            },
+            {
+              "id": "portugues",
+              "name": "Português",
+              "icon": "📖",
+              "color": "#27AE60",
+              "keywords": ["português", "língua portuguesa", "redação", "literatura"]
+            },
+            {
+              "id": "historia",
+              "name": "História",
+              "icon": "📜",
+              "color": "#8B4513",
+              "keywords": ["história"]
+            },
+            {
+              "id": "ciencias",
+              "name": "Ciências",
+              "icon": "🔬",
+              "color": "#2ECC71",
+              "keywords": ["ciências", "biologia", "química", "física"]
+            },
+            {
+              "id": "ingles",
+              "name": "Inglês",
+              "icon": "🇬🇧",
+              "color": "#3E4095",
+              "keywords": ["inglês", "english", "toefl", "ielts", "cambridge"]
+            }
+          ]
+        },
+        {
+          "category": "Áreas Acadêmicas",
+          "stacks": [
+            {
+              "id": "engenharia_edu",
+              "name": "Engenharia",
+              "icon": "⚙️",
+              "color": "#E67E22",
+              "keywords": ["engenharia civil", "engenharia elétrica", "engenharia mecânica", "engenharia de produção"]
+            },
+            {
+              "id": "direito",
+              "name": "Direito",
+              "icon": "⚖️",
+              "color": "#8E44AD",
+              "keywords": ["direito", "jurídico", "advogado", "advocacia", "jurisprudência"]
+            },
+            {
+              "id": "administracao",
+              "name": "Administração",
+              "icon": "💼",
+              "color": "#2C3E50",
+              "keywords": ["administração", "gestão empresarial", "mba"]
+            },
+            {
+              "id": "contabilidade",
+              "name": "Contabilidade",
+              "icon": "🧮",
+              "color": "#1F618D",
+              "keywords": ["contabilidade", "contador", "auditoria"]
+            },
+            {
+              "id": "economia",
+              "name": "Economia",
+              "icon": "📈",
+              "color": "#D4AC0D",
+              "keywords": ["economia", "economista", "macroeconomia", "microeconomia"]
+            }
+          ]
+        },
+        {
+          "category": "Técnicas",
+          "stacks": [
+            {
+              "id": "ensino_hibrido",
+              "name": "Ensino Híbrido",
+              "icon": "🔄",
+              "color": "#16A085",
+              "keywords": ["ensino híbrido", "blended learning"]
+            },
+            {
+              "id": "sala_invertida",
+              "name": "Sala Invertida",
+              "icon": "🔃",
+              "color": "#2980B9",
+              "keywords": ["sala invertida", "flipped classroom"]
+            },
+            {
+              "id": "ead",
+              "name": "EAD",
+              "icon": "🖥️",
+              "color": "#8E44AD",
+              "keywords": ["ead", "ensino a distância", "e-learning", "educação a distância"]
+            },
+            {
+              "id": "gamificacao",
+              "name": "Gamificação",
+              "icon": "🎮",
+              "color": "#E74C3C",
+              "keywords": ["gamificação", "gamification"]
+            }
+          ]
+        },
+        {
+          "category": "Plataformas",
+          "stacks": [
+            {
+              "id": "moodle",
+              "name": "Moodle",
+              "icon": "🎓",
+              "color": "#F98012",
+              "keywords": ["moodle"]
+            },
+            {
+              "id": "google_classroom",
+              "name": "Google Classroom",
+              "icon": "📚",
+              "color": "#0F9D58",
+              "keywords": ["google classroom"]
+            },
+            {
+              "id": "blackboard",
+              "name": "Blackboard",
+              "icon": "📋",
+              "color": "#262626",
+              "keywords": ["blackboard"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "area": "Artes e Design",
+      "icon": "🎨",
+      "categories": [
+        {
+          "category": "Técnicas",
+          "stacks": [
+            {
+              "id": "pintura",
+              "name": "Pintura",
+              "icon": "🖌️",
+              "color": "#E74C3C",
+              "keywords": ["pintura", "aquarela", "óleo sobre tela"]
+            },
+            {
+              "id": "escultura",
+              "name": "Escultura",
+              "icon": "🗿",
+              "color": "#95A5A6",
+              "keywords": ["escultura"]
+            },
+            {
+              "id": "fotografia",
+              "name": "Fotografia",
+              "icon": "📷",
+              "color": "#2C3E50",
+              "keywords": ["fotografia", "fotógrafo", "lightroom"]
+            }
+          ]
+        },
+        {
+          "category": "Ferramentas",
+          "stacks": [
+            {
+              "id": "photoshop",
+              "name": "Photoshop",
+              "icon": "🖼️",
+              "color": "#31A8FF",
+              "keywords": ["photoshop", "adobe photoshop"]
+            },
+            {
+              "id": "illustrator",
+              "name": "Illustrator",
+              "icon": "✏️",
+              "color": "#FF9A00",
+              "keywords": ["illustrator", "adobe illustrator"]
+            },
+            {
+              "id": "figma",
+              "name": "Figma",
+              "icon": "🎨",
+              "color": "#F24E1E",
+              "keywords": ["figma"]
+            },
+            {
+              "id": "canva",
+              "name": "Canva",
+              "icon": "🎯",
+              "color": "#00C4CC",
+              "keywords": ["canva"]
+            },
+            {
+              "id": "after_effects",
+              "name": "After Effects",
+              "icon": "🎬",
+              "color": "#9999FF",
+              "keywords": ["after effects", "motion graphics"]
+            },
+            {
+              "id": "premiere",
+              "name": "Premiere Pro",
+              "icon": "🎥",
+              "color": "#9999FF",
+              "keywords": ["premiere", "premiere pro"]
+            },
+            {
+              "id": "blender",
+              "name": "Blender",
+              "icon": "🧊",
+              "color": "#E87D0D",
+              "keywords": ["blender", "3d modeling"]
+            },
+            {
+              "id": "autocad",
+              "name": "AutoCAD",
+              "icon": "📐",
+              "color": "#DA1F26",
+              "keywords": ["autocad", "auto cad"]
+            },
+            {
+              "id": "sketch",
+              "name": "Sketch",
+              "icon": "💎",
+              "color": "#FDB300",
+              "keywords": ["sketch"]
+            },
+            {
+              "id": "indesign",
+              "name": "InDesign",
+              "icon": "📰",
+              "color": "#FF3366",
+              "keywords": ["indesign", "adobe indesign"]
+            }
+          ]
+        },
+        {
+          "category": "Áreas",
+          "stacks": [
+            {
+              "id": "composicao_musical",
+              "name": "Composição Musical",
+              "icon": "🎵",
+              "color": "#8E44AD",
+              "keywords": ["composição", "compositor", "produção musical", "arranjo"]
+            },
+            {
+              "id": "ux_ui",
+              "name": "UX/UI Design",
+              "icon": "🖥️",
+              "color": "#FF6F61",
+              "keywords": ["ux", "ui", "ux design", "ui design", "user experience", "design thinking"]
+            }
+          ]
+        },
+        {
+          "category": "Funções",
+          "stacks": [
+            {
+              "id": "direcao",
+              "name": "Direção",
+              "icon": "🎬",
+              "color": "#2C3E50",
+              "keywords": ["direção", "diretor"]
+            },
+            {
+              "id": "roteiro",
+              "name": "Roteiro",
+              "icon": "📝",
+              "color": "#7F8C8D",
+              "keywords": ["roteiro", "roteirista", "screenwriter"]
+            },
+            {
+              "id": "edicao_video",
+              "name": "Edição de Vídeo",
+              "icon": "✂️",
+              "color": "#8E44AD",
+              "keywords": ["edição de vídeo", "editor de vídeo", "video editing"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "area": "Marketing e Comunicação",
+      "icon": "📣",
+      "categories": [
+        {
+          "category": "Marketing Digital",
+          "stacks": [
+            {
+              "id": "seo",
+              "name": "SEO",
+              "icon": "🔍",
+              "color": "#4285F4",
+              "keywords": ["seo", "search engine optimization", "otimização de sites"]
+            },
+            {
+              "id": "google_ads",
+              "name": "Google Ads",
+              "icon": "📢",
+              "color": "#4285F4",
+              "keywords": ["google ads", "adwords", "sem"]
+            },
+            {
+              "id": "social_media",
+              "name": "Social Media",
+              "icon": "📱",
+              "color": "#E91E63",
+              "keywords": ["social media", "mídias sociais", "redes sociais", "community manager"]
+            },
+            {
+              "id": "email_marketing",
+              "name": "Email Marketing",
+              "icon": "📧",
+              "color": "#FF5722",
+              "keywords": ["email marketing", "mailchimp", "hubspot"]
+            },
+            {
+              "id": "analytics",
+              "name": "Analytics",
+              "icon": "📊",
+              "color": "#E37400",
+              "keywords": ["google analytics", "analytics", "tag manager", "gtm"]
+            },
+            {
+              "id": "inbound",
+              "name": "Inbound Marketing",
+              "icon": "🧲",
+              "color": "#FF7A59",
+              "keywords": ["inbound marketing", "inbound", "content marketing", "marketing de conteúdo"]
+            },
+            {
+              "id": "copywriting",
+              "name": "Copywriting",
+              "icon": "✍️",
+              "color": "#2C3E50",
+              "keywords": ["copywriting", "copywriter", "redação publicitária"]
+            }
+          ]
+        },
+        {
+          "category": "Comunicação",
+          "stacks": [
+            {
+              "id": "jornalismo",
+              "name": "Jornalismo",
+              "icon": "📰",
+              "color": "#34495E",
+              "keywords": ["jornalismo", "jornalista", "assessoria de imprensa"]
+            },
+            {
+              "id": "relacoes_publicas",
+              "name": "Relações Públicas",
+              "icon": "🤝",
+              "color": "#1ABC9C",
+              "keywords": ["relações públicas", "comunicação corporativa", "comunicação empresarial"]
+            },
+            {
+              "id": "branding",
+              "name": "Branding",
+              "icon": "🏷️",
+              "color": "#E67E22",
+              "keywords": ["branding", "marca", "identidade visual", "brand"]
+            }
+          ]
+        },
+        {
+          "category": "CRM/Vendas",
+          "stacks": [
+            {
+              "id": "salesforce",
+              "name": "Salesforce",
+              "icon": "☁️",
+              "color": "#00A1E0",
+              "keywords": ["salesforce"]
+            },
+            {
+              "id": "crm",
+              "name": "CRM",
+              "icon": "🤝",
+              "color": "#2ECC71",
+              "keywords": ["crm", "customer relationship"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "area": "Finanças e Gestão",
+      "icon": "💰",
+      "categories": [
+        {
+          "category": "Ferramentas",
+          "stacks": [
+            {
+              "id": "excel",
+              "name": "Excel",
+              "icon": "📊",
+              "color": "#217346",
+              "keywords": ["excel", "microsoft excel", "planilhas", "vba", "macro"]
+            },
+            {
+              "id": "sap",
+              "name": "SAP",
+              "icon": "🔷",
+              "color": "#0F4A8A",
+              "keywords": ["sap", "sap erp", "sap hana"]
+            },
+            {
+              "id": "totvs",
+              "name": "TOTVS",
+              "icon": "🔹",
+              "color": "#00A3E0",
+              "keywords": ["totvs", "protheus"]
+            }
+          ]
+        },
+        {
+          "category": "Metodologias",
+          "stacks": [
+            {
+              "id": "scrum",
+              "name": "Scrum",
+              "icon": "🔄",
+              "color": "#6DB33F",
+              "keywords": ["scrum", "scrum master", "sprint"]
+            },
+            {
+              "id": "kanban",
+              "name": "Kanban",
+              "icon": "📋",
+              "color": "#0079BF",
+              "keywords": ["kanban", "trello", "jira"]
+            },
+            {
+              "id": "agile",
+              "name": "Ágil",
+              "icon": "🏃",
+              "color": "#47C1BF",
+              "keywords": ["ágil", "agile", "metodologia ágil"]
+            },
+            {
+              "id": "lean",
+              "name": "Lean",
+              "icon": "📐",
+              "color": "#F1C40F",
+              "keywords": ["lean", "lean manufacturing", "lean startup"]
+            },
+            {
+              "id": "six_sigma",
+              "name": "Six Sigma",
+              "icon": "σ",
+              "color": "#2C3E50",
+              "keywords": ["six sigma", "seis sigma", "green belt", "black belt"]
+            },
+            {
+              "id": "pmp",
+              "name": "PMP / PMI",
+              "icon": "📋",
+              "color": "#3949AB",
+              "keywords": ["pmp", "pmi", "pmbok", "gestão de projetos", "project management"]
+            }
+          ]
+        },
+        {
+          "category": "Finanças",
+          "stacks": [
+            {
+              "id": "contabilidade_fin",
+              "name": "Contabilidade",
+              "icon": "🧮",
+              "color": "#1F618D",
+              "keywords": ["contabilidade", "balanço", "dre", "demonstrações financeiras"]
+            },
+            {
+              "id": "investimentos",
+              "name": "Investimentos",
+              "icon": "📈",
+              "color": "#27AE60",
+              "keywords": ["investimentos", "renda fixa", "renda variável", "fundos", "bolsa de valores"]
+            },
+            {
+              "id": "compliance",
+              "name": "Compliance",
+              "icon": "✅",
+              "color": "#2C3E50",
+              "keywords": ["compliance", "governança corporativa", "lgpd", "gdpr"]
+            }
+          ]
+        },
+        {
+          "category": "RH / People",
+          "stacks": [
+            {
+              "id": "rh",
+              "name": "Recursos Humanos",
+              "icon": "👥",
+              "color": "#3498DB",
+              "keywords": ["recursos humanos", "rh", "recrutamento", "seleção", "talent acquisition"]
+            },
+            {
+              "id": "dp",
+              "name": "Departamento Pessoal",
+              "icon": "📑",
+              "color": "#7F8C8D",
+              "keywords": ["departamento pessoal", "folha de pagamento", "admissão", "demissão", "e-social"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "area": "Engenharia e Indústria",
+      "icon": "🏭",
+      "categories": [
+        {
+          "category": "Áreas",
+          "stacks": [
+            {
+              "id": "eng_civil",
+              "name": "Engenharia Civil",
+              "icon": "🏗️",
+              "color": "#E67E22",
+              "keywords": ["engenharia civil", "construção civil", "estruturas"]
+            },
+            {
+              "id": "eng_mecanica",
+              "name": "Engenharia Mecânica",
+              "icon": "⚙️",
+              "color": "#7F8C8D",
+              "keywords": ["engenharia mecânica", "mecanica"]
+            },
+            {
+              "id": "eng_eletrica",
+              "name": "Engenharia Elétrica",
+              "icon": "⚡",
+              "color": "#F1C40F",
+              "keywords": ["engenharia elétrica", "eletricista", "circuitos"]
+            },
+            {
+              "id": "eng_producao",
+              "name": "Engenharia de Produção",
+              "icon": "📊",
+              "color": "#1ABC9C",
+              "keywords": ["engenharia de produção", "produção industrial"]
+            },
+            {
+              "id": "eng_quimica",
+              "name": "Engenharia Química",
+              "icon": "🧪",
+              "color": "#9B59B6",
+              "keywords": ["engenharia química"]
+            },
+            {
+              "id": "eng_ambiental",
+              "name": "Engenharia Ambiental",
+              "icon": "🌿",
+              "color": "#27AE60",
+              "keywords": ["engenharia ambiental", "meio ambiente", "sustentabilidade"]
+            }
+          ]
+        },
+        {
+          "category": "Ferramentas",
+          "stacks": [
+            {
+              "id": "solidworks",
+              "name": "SolidWorks",
+              "icon": "🔩",
+              "color": "#C02032",
+              "keywords": ["solidworks"]
+            },
+            {
+              "id": "matlab",
+              "name": "MATLAB",
+              "icon": "📐",
+              "color": "#0076A8",
+              "keywords": ["matlab", "simulink"]
+            },
+            {
+              "id": "revit",
+              "name": "Revit/BIM",
+              "icon": "🏢",
+              "color": "#1E8FCC",
+              "keywords": ["revit", "bim", "building information modeling"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "area": "Logística e Supply Chain",
+      "icon": "🚛",
+      "categories": [
+        {
+          "category": "Operações",
+          "stacks": [
+            {
+              "id": "supply_chain",
+              "name": "Supply Chain",
+              "icon": "🔗",
+              "color": "#2980B9",
+              "keywords": ["supply chain", "cadeia de suprimentos", "logística"]
+            },
+            {
+              "id": "compras",
+              "name": "Compras/Procurement",
+              "icon": "🛒",
+              "color": "#27AE60",
+              "keywords": ["compras", "procurement", "sourcing"]
+            },
+            {
+              "id": "estoque",
+              "name": "Gestão de Estoque",
+              "icon": "📦",
+              "color": "#E67E22",
+              "keywords": ["gestão de estoque", "inventário", "wms"]
+            },
+            {
+              "id": "comercio_exterior",
+              "name": "Comércio Exterior",
+              "icon": "🌍",
+              "color": "#2C3E50",
+              "keywords": ["comércio exterior", "importação", "exportação", "aduaneiro"]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "ats_config": {
+    "sections_expected": [
+      {"key": "summary", "names": ["resumo", "summary", "objetivo", "perfil", "sobre mim", "about", "profile"], "weight": 10},
+      {"key": "experience", "names": ["experiência", "experience", "experiencia profissional", "professional experience", "histórico profissional"], "weight": 25},
+      {"key": "education", "names": ["formação", "educação", "education", "formação acadêmica", "academic background"], "weight": 15},
+      {"key": "skills", "names": ["competências", "habilidades", "skills", "conhecimentos", "tecnologias", "ferramentas"], "weight": 20},
+      {"key": "certifications", "names": ["certificações", "certifications", "certificados", "cursos", "courses"], "weight": 10},
+      {"key": "languages", "names": ["idiomas", "languages", "línguas"], "weight": 5},
+      {"key": "projects", "names": ["projetos", "projects", "portfólio", "portfolio"], "weight": 10}
+    ],
+    "action_verbs": [
+      "desenvolveu", "implementou", "criou", "liderou", "gerenciou", "otimizou",
+      "reduziu", "aumentou", "automatizou", "projetou", "coordenou", "planejou",
+      "entregou", "migrou", "refatorou", "integrou", "escalou", "monitorou",
+      "analisou", "publicou", "mentoreou", "treinou", "negociou", "solucionou",
+      "designed", "developed", "implemented", "built", "managed", "led",
+      "optimized", "reduced", "increased", "automated", "delivered", "created",
+      "integrated", "scaled", "monitored", "analyzed", "published", "mentored",
+      "architected", "deployed", "maintained", "improved", "established",
+      "collaborated", "contributed", "organized", "launched", "coordinated"
+    ],
+    "quantifiers_patterns": [
+      "\\d+%", "\\d+\\s*(%|percent)", "\\$[\\d,.]+", "R\\$\\s*[\\d,.]+",
+      "\\d+\\s*(users|usuários|clientes|clients|projetos|projects)",
+      "\\d+\\s*(equipe|team|pessoas|people|membros|members)",
+      "\\d+x", "\\d+\\s*(vezes|times)", "\\d+k", "\\d+M",
+      "\\d+\\s*(meses|months|anos|years)"
+    ],
+    "contact_patterns": {
+      "email": "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}",
+      "phone": "\\(?\\d{2}\\)?\\s*\\d{4,5}-?\\d{4}|\\+\\d{2}\\s*\\d{2}\\s*\\d{4,5}-?\\d{4}",
+      "linkedin": "linkedin\\.com/in/",
+      "github": "github\\.com/",
+      "portfolio": "(portf[oó]lio|portfolio|site pessoal|personal website)"
+    }
+  }
+}

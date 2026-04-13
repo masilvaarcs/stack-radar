@@ -292,6 +292,76 @@ html.transitioning *::after {
    STACKS GRID
 ═══════════════════════════════════════════════════ */
 #stacks-section { display: none; }
+
+/* ═══════════════════════════════════════════════════
+   ATS METRICS DASHBOARD
+═══════════════════════════════════════════════════ */
+#ats-section { display: none; }
+.ats-score-row {
+  display: flex; align-items: center; gap: 2rem; margin-bottom: 1.8rem;
+  flex-wrap: wrap;
+}
+.ats-score-circle {
+  position: relative; width: 130px; height: 130px; flex-shrink: 0;
+}
+.ats-score-circle svg { width: 100%; height: 100%; }
+.ats-score-value {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -60%);
+  font-size: 2rem; font-weight: 800; color: var(--text-h); font-family: var(--mono);
+}
+.ats-score-label {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, 55%);
+  font-size: .65rem; color: var(--muted2); font-family: var(--mono); text-transform: uppercase;
+  letter-spacing: .08em;
+}
+.ats-summary {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: .6rem; flex: 1; min-width: 200px;
+}
+.ats-stat {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  padding: .7rem .9rem; text-align: center;
+}
+.ats-stat-val { font-size: 1.3rem; font-weight: 700; color: var(--text-h); font-family: var(--mono); }
+.ats-stat-lab { font-size: .62rem; color: var(--muted2); margin-top: .15rem; font-family: var(--mono); text-transform: uppercase; letter-spacing: .05em; }
+
+.ats-details {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: .8rem; margin-bottom: 1.5rem;
+}
+.ats-bar-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  padding: .9rem 1rem;
+}
+.ats-bar-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: .5rem; }
+.ats-bar-name { font-size: .72rem; font-weight: 600; color: var(--text); }
+.ats-bar-score { font-size: .72rem; font-weight: 700; color: var(--text-h); font-family: var(--mono); }
+.ats-bar-track {
+  height: 6px; background: var(--sur2); border-radius: 3px; overflow: hidden;
+}
+.ats-bar-fill {
+  height: 100%; border-radius: 3px; transition: width 1s ease-out;
+  background: linear-gradient(90deg, var(--amber), var(--green));
+}
+.ats-bar-info { font-size: .6rem; color: var(--muted); margin-top: .35rem; font-family: var(--mono); }
+
+.ats-suggestions {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  padding: 1.2rem 1.4rem; margin-bottom: 2rem;
+}
+.ats-sug-title { font-size: .85rem; font-weight: 700; color: var(--text-h); margin-bottom: .8rem; }
+.ats-sug-item {
+  display: flex; align-items: flex-start; gap: .6rem; padding: .6rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.ats-sug-item:last-child { border-bottom: none; }
+.ats-sug-badge {
+  flex-shrink: 0; padding: .15rem .5rem; border-radius: 100px; font-size: .58rem;
+  font-weight: 700; font-family: var(--mono); text-transform: uppercase;
+}
+.ats-sug-badge.alta { background: rgba(248,113,113,.15); color: var(--red); }
+.ats-sug-badge.media { background: rgba(245,158,11,.15); color: var(--amber); }
+.ats-sug-msg { font-size: .73rem; color: var(--text); line-height: 1.45; }
 .sec-head { display: flex; align-items: baseline; gap: .8rem; margin-bottom: 1rem; }
 .sec-title { font-size: 1.1rem; font-weight: 700; color: var(--text-h); }
 .sec-count { font-family: var(--mono); font-size: .7rem; color: var(--muted2); }
@@ -678,6 +748,40 @@ footer { border-top: 1px solid var(--border); padding: 2.5rem 0 3rem; text-align
   </div>
 </div></div>
 
+<!-- ATS METRICS DASHBOARD -->
+<section class="z1" id="ats-section" style="display:none">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 class="sec-title">📊 Análise ATS do Currículo</h2>
+      <span class="sec-count" id="ats-classif"></span>
+    </div>
+
+    <!-- Score principal -->
+    <div class="ats-score-row" id="ats-score-row">
+      <div class="ats-score-circle" id="ats-circle">
+        <svg viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="52" fill="none" stroke="var(--border)" stroke-width="8"/>
+          <circle id="ats-ring" cx="60" cy="60" r="52" fill="none" stroke="#27AE60" stroke-width="8"
+            stroke-dasharray="326.73" stroke-dashoffset="326.73" stroke-linecap="round"
+            transform="rotate(-90 60 60)" style="transition: stroke-dashoffset 1.2s ease-out, stroke .4s"/>
+        </svg>
+        <div class="ats-score-value" id="ats-score-val">0</div>
+        <div class="ats-score-label">Score ATS</div>
+      </div>
+      <div class="ats-summary" id="ats-summary"></div>
+    </div>
+
+    <!-- Barras de detalhe -->
+    <div class="ats-details" id="ats-details"></div>
+
+    <!-- Sugestões de melhoria -->
+    <div class="ats-suggestions" id="ats-suggestions">
+      <h3 class="ats-sug-title">💡 Sugestões de Melhoria</h3>
+      <div id="ats-sug-list"></div>
+    </div>
+  </div>
+</section>
+
 <!-- STACKS GRID -->
 <section class="z1" id="stacks-section">
   <div class="wrap">
@@ -947,16 +1051,22 @@ async function pipelineReal(file) {
     return;
   }
 
-  const { session_id, encontradas, stacks: stacksInfo } = uploadRes;
+  const { session_id, encontradas, stacks: stacksInfo, ats } = uploadRes;
   sessionId   = session_id;
   totalStacks = encontradas;
 
   activarNode('p-ext', 'pc2');
-  log(`🔍 PyMuPDF extraiu texto — ${encontradas} stack(s) detectada(s)`, 'k');
+  log(`🔍 PyMuPDF extraiu texto — ${encontradas} competência(s) detectada(s)`, 'k');
   log(`📦 Stacks: ${stacksInfo.map(s => s.name).join(', ')}`, 'd');
 
+  // Renderiza ATS metrics
+  if (ats) {
+    renderATS(ats);
+    log(`📊 Score ATS: ${ats.score}/100 — ${ats.classificacao}`, ats.score >= 60 ? 'k' : 'w');
+  }
+
   // Inicializa cards como "pendentes"
-  stacksAll = stacksInfo.map(s => ({ id: s.id, name: s.name, icon: s.icon, ...(DEMO_DB[s.id]||{}) }));
+  stacksAll = stacksInfo.map(s => ({ id: s.id, name: s.name, icon: s.icon, area: s.area||'', ...(DEMO_DB[s.id]||{}) }));
   renderGrid(stacksAll);
 
   // 2. Conecta WebSocket ANTES de disparar o pipeline
@@ -1044,18 +1154,20 @@ function conectarWS(sid) {
 //  PIPELINE DEMO (sem backend)
 // ═══════════════════════════════════════════════════════════════
 async function pipelineDemo(comPDF = false, file = null) {
-  const DEMO_IDS = ['python','react','typescript','angular','javascript','node',
-                    'docker','rabbitmq','postgresql','sql','csharp','dotnet',
-                    'redis','fastapi','flask','pandas','django'];
+  const DEMO_IDS = Object.keys(DEMO_DB);
 
   // Simula detecção em PDF real (extrai texto básico no browser)
   let detectedIds = DEMO_IDS;
+  let pdfText = '';
   if (comPDF && file) {
     try {
-      const text = await lerPDFBasico(file);
-      const kws = {python:['python'],react:['react'],typescript:['typescript'],angular:['angular'],javascript:['javascript','node'],node:['node.js','nodejs'],docker:['docker'],rabbitmq:['rabbitmq','amqp'],postgresql:['postgresql','postgres'],sql:[' sql ','mysql','sqlite'],csharp:['c#'],dotnet:['.net','asp.net'],redis:['redis'],fastapi:['fastapi'],flask:['flask'],pandas:['pandas','numpy'],django:['django']};
+      pdfText = await lerPDFBasico(file);
+      const kws = {};
+      for (const [id, info] of Object.entries(DEMO_DB)) {
+        kws[id] = (info.keywords || [id]);
+      }
       const found = [];
-      const tl = text.toLowerCase();
+      const tl = pdfText.toLowerCase();
       for (const [id, kw] of Object.entries(kws)) {
         if (kw.some(k => tl.includes(k))) found.push(id);
       }
@@ -1072,9 +1184,13 @@ async function pipelineDemo(comPDF = false, file = null) {
   await sleep(400);
 
   activarNode('p-ext', 'pc2');
-  log(`🔍 Texto extraído — ${totalStacks} stack(s) detectada(s)`, 'k');
+  log(`🔍 Texto extraído — ${totalStacks} competência(s) detectada(s)`, 'k');
   log(`📦 ${stacksAll.map(s=>s.name).join(', ')}`, 'd');
   await sleep(500);
+
+  // ATS Demo
+  const atsDemo = gerarATSDemo(stacksAll, pdfText || 'demo mode');
+  renderATS(atsDemo);
 
   renderGrid(stacksAll);
 
@@ -1129,6 +1245,48 @@ async function lerPDFBasico(file) {
   });
 }
 
+function gerarATSDemo(stacks, texto) {
+  const nStacks = stacks.length;
+  const areas = [...new Set(stacks.map(s => s.area || s.category))];
+  const cats = [...new Set(stacks.map(s => s.category))];
+  const isDemoMode = texto === 'demo mode';
+  return {
+    score: isDemoMode ? 72 : Math.min(95, 40 + nStacks * 3),
+    classificacao: isDemoMode ? "Bom" : (nStacks > 12 ? "Excelente" : "Bom"),
+    classificacao_cor: isDemoMode ? "#F1C40F" : (nStacks > 12 ? "#27AE60" : "#F1C40F"),
+    detalhes: {
+      secoes: { score: isDemoMode ? 71 : 60, encontradas: {
+        summary: {found: true, weight:10, names:["resumo"]},
+        experience: {found: true, weight:25, names:["experiência"]},
+        education: {found: true, weight:15, names:["formação"]},
+        skills: {found: true, weight:20, names:["competências"]},
+        certifications: {found: isDemoMode, weight:10, names:["certificações"]},
+        languages: {found: isDemoMode, weight:5, names:["idiomas"]},
+        projects: {found: false, weight:10, names:["projetos"]}
+      }, peso: "30%" },
+      verbos_acao: { score: isDemoMode ? 70 : 50, encontrados: ["desenvolveu","implementou","liderou","otimizou","gerenciou","criou","integrou"], total: 7, peso: "15%" },
+      metricas_quantificaveis: { score: isDemoMode ? 60 : 45, encontradas: ["30%","5 projetos","3 anos","equipe de 8"], total: 4, peso: "15%" },
+      contato: { score: isDemoMode ? 80 : 60, encontrados: {email:true, phone:true, linkedin:isDemoMode, github:false, portfolio:false}, peso: "15%" },
+      comprimento: { score: isDemoMode ? 100 : 80, total_palavras: isDemoMode ? 520 : Math.max(200,texto.split(' ').length), dica: "Comprimento ideal para a maioria das vagas.", peso: "10%" },
+      competencias: { score: Math.min(100, nStacks * 8), total: nStacks, areas: areas, categorias: cats, peso: "15%" }
+    },
+    sugestoes: [
+      ...(isDemoMode ? [{tipo:"secao_ausente",prioridade:"media",mensagem:"Seção 'Projetos' não encontrada. Adicione para destacar entregas concretas.",impacto:10}] : []),
+      ...(!isDemoMode && nStacks < 8 ? [{tipo:"competencias",prioridade:"media",mensagem:`Apenas ${nStacks} competências detectadas. Liste claramente suas skills.`,impacto:10}] : []),
+      {tipo:"contato",prioridade:"media",mensagem:"GitHub não encontrado. Adicione o link do seu repositório para mostrar código real.",impacto:10},
+    ],
+    resumo: {
+      total_palavras: isDemoMode ? 520 : Math.max(200, texto.split(' ').length),
+      total_linhas: isDemoMode ? 85 : Math.max(30, Math.floor(texto.split('\n').length)),
+      stacks_detectadas: nStacks,
+      secoes_encontradas: isDemoMode ? 5 : 4,
+      secoes_esperadas: 7,
+      verbos_acao: 7,
+      metricas_numericas: 4,
+    }
+  };
+}
+
 async function modoDemo() {
   resetUI();
   log('⚡ Modo DEMO — simulando currículo Full-Stack Sênior', 'w');
@@ -1144,6 +1302,7 @@ function resetUI() {
   document.getElementById('viewer').style.display='none';
   document.getElementById('qbadge').style.display='none';
   document.getElementById('terminal').style.display='none';
+  document.getElementById('ats-section').style.display='none';
   document.getElementById('tbody').innerHTML='';
   document.getElementById('sgrid').innerHTML='';
   document.getElementById('vtabs').innerHTML='';
@@ -1171,6 +1330,116 @@ function atualizarQueueBadge(proc, total, pct) {
   document.getElementById('qtext').textContent  = `Consumer processando...`;
   document.getElementById('qfrac').textContent  = `${proc}/${total}`;
   document.getElementById('qfill').style.width  = `${pct}%`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  ATS METRICS RENDER
+// ═══════════════════════════════════════════════════════════════
+function renderATS(ats) {
+  if (!ats) return;
+  const sec = document.getElementById('ats-section');
+  sec.style.display = 'block';
+
+  // Classificação badge
+  document.getElementById('ats-classif').innerHTML =
+    `<span style="background:${esc(ats.classificacao_cor)}22;color:${esc(ats.classificacao_cor)};padding:.2rem .7rem;border-radius:100px;font-weight:700">${esc(ats.classificacao)}</span>`;
+
+  // Score circle
+  const score = ats.score || 0;
+  const ring = document.getElementById('ats-ring');
+  const circumference = 326.73;
+  const offset = circumference - (circumference * score / 100);
+  setTimeout(() => {
+    ring.style.strokeDashoffset = offset;
+    ring.style.stroke = ats.classificacao_cor || '#27AE60';
+  }, 100);
+
+  // Animate score number
+  const valEl = document.getElementById('ats-score-val');
+  let current = 0;
+  const step = Math.max(1, Math.floor(score / 40));
+  const timer = setInterval(() => {
+    current = Math.min(current + step, score);
+    valEl.textContent = current;
+    if (current >= score) clearInterval(timer);
+  }, 30);
+
+  // Summary stats
+  const r = ats.resumo || {};
+  const summaryEl = document.getElementById('ats-summary');
+  const stats = [
+    { val: r.total_palavras || 0, lab: 'Palavras' },
+    { val: r.stacks_detectadas || 0, lab: 'Competências' },
+    { val: `${r.secoes_encontradas || 0}/${r.secoes_esperadas || 7}`, lab: 'Seções' },
+    { val: r.verbos_acao || 0, lab: 'Verbos de Ação' },
+    { val: r.metricas_numericas || 0, lab: 'Métricas Numéricas' },
+  ];
+  summaryEl.innerHTML = stats.map(s =>
+    `<div class="ats-stat"><div class="ats-stat-val">${esc(String(s.val))}</div><div class="ats-stat-lab">${esc(s.lab)}</div></div>`
+  ).join('');
+
+  // Detail bars
+  const d = ats.detalhes || {};
+  const detailsEl = document.getElementById('ats-details');
+  const bars = [
+    { name: '📋 Seções do CV', score: d.secoes?.score || 0, peso: d.secoes?.peso || '', info: formatSecoes(d.secoes) },
+    { name: '🎯 Verbos de Ação', score: d.verbos_acao?.score || 0, peso: d.verbos_acao?.peso || '', info: (d.verbos_acao?.encontrados || []).slice(0,8).join(', ') || 'Nenhum encontrado' },
+    { name: '📊 Métricas Quantificáveis', score: d.metricas_quantificaveis?.score || 0, peso: d.metricas_quantificaveis?.peso || '', info: (d.metricas_quantificaveis?.encontradas || []).slice(0,5).join(', ') || 'Nenhuma encontrada' },
+    { name: '📞 Info de Contato', score: d.contato?.score || 0, peso: d.contato?.peso || '', info: formatContato(d.contato) },
+    { name: '📏 Comprimento', score: d.comprimento?.score || 0, peso: d.comprimento?.peso || '', info: d.comprimento?.dica || '' },
+    { name: '🛠️ Competências', score: d.competencias?.score || 0, peso: d.competencias?.peso || '', info: `${d.competencias?.total || 0} detectadas em ${(d.competencias?.areas || []).length} áreas` },
+  ];
+  detailsEl.innerHTML = bars.map(b => {
+    const color = b.score >= 70 ? '#27AE60' : b.score >= 40 ? '#F1C40F' : '#E74C3C';
+    return `<div class="ats-bar-card">
+      <div class="ats-bar-head">
+        <span class="ats-bar-name">${esc(b.name)}</span>
+        <span class="ats-bar-score" style="color:${color}">${b.score}%</span>
+      </div>
+      <div class="ats-bar-track"><div class="ats-bar-fill" style="width:0;background:linear-gradient(90deg,${color}88,${color})" data-width="${b.score}%"></div></div>
+      <div class="ats-bar-info">${esc(b.info)} <span style="opacity:.5">(peso: ${esc(b.peso)})</span></div>
+    </div>`;
+  }).join('');
+
+  // Animate bars
+  setTimeout(() => {
+    detailsEl.querySelectorAll('.ats-bar-fill').forEach(el => { el.style.width = el.dataset.width; });
+  }, 200);
+
+  // Suggestions
+  const sugList = document.getElementById('ats-sug-list');
+  const sugs = ats.sugestoes || [];
+  if (sugs.length === 0) {
+    sugList.innerHTML = '<div style="color:var(--green);font-size:.75rem">✅ Nenhuma sugestão crítica — seu currículo está bem estruturado!</div>';
+  } else {
+    sugList.innerHTML = sugs.map(s =>
+      `<div class="ats-sug-item">
+        <span class="ats-sug-badge ${esc(s.prioridade)}">${esc(s.prioridade)}</span>
+        <span class="ats-sug-msg">${esc(s.mensagem)}</span>
+      </div>`
+    ).join('');
+  }
+}
+
+function formatSecoes(secoes) {
+  if (!secoes?.encontradas) return '';
+  const found = [], missing = [];
+  for (const [k, v] of Object.entries(secoes.encontradas)) {
+    (v.found ? found : missing).push(k.replace('_',' '));
+  }
+  let txt = '';
+  if (found.length) txt += '✅ ' + found.join(', ');
+  if (missing.length) txt += (txt ? ' · ' : '') + '❌ ' + missing.join(', ');
+  return txt;
+}
+
+function formatContato(contato) {
+  if (!contato?.encontrados) return '';
+  const items = [];
+  for (const [k, v] of Object.entries(contato.encontrados)) {
+    items.push((v ? '✅' : '❌') + ' ' + k);
+  }
+  return items.join(' · ');
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1277,12 +1546,13 @@ function mostrarViewer(id) {
     react:'jsx',angular:'typescript',typescript:'typescript',javascript:'javascript',
     node:'javascript',docker:'dockerfile',postgresql:'sql',sql:'sql',csharp:'csharp',
     dotnet:'csharp',rabbitmq:'python',redis:'python'};
-  document.getElementById('code-title').textContent = stack.example_title||'Exemplo de código';
-  document.getElementById('code-lang').textContent = langMap[id]||'code';
+  document.getElementById('code-title').textContent = stack.example_title||'Detalhes';
+  document.getElementById('code-lang').textContent = langMap[id]||stack.category||'info';
 
-  const code  = stack.example||stack.code||'// sem exemplo';
+  const hasCode = !!(stack.example || stack.code);
+  const code  = hasCode ? (stack.example||stack.code) : `// ${stack.name}\n// Área: ${stack.area||stack.category||'-'}\n// Categoria: ${stack.category||'-'}\n//\n// Competência detectada no currículo.\n// Esta stack não possui exemplo de código interativo.\n// Dica: mencione projetos concretos com ${stack.name} no seu CV\n// para aumentar seu score ATS.`;
   const lines = code.split('\n');
-  document.getElementById('vlines').textContent = `${lines.length} linhas`;
+  document.getElementById('vlines').textContent = hasCode ? `${lines.length} linhas` : 'info';
   document.getElementById('lnums').innerHTML    = lines.map((_,i)=>`<span>${i+1}</span>`).join('');
   document.getElementById('cblock').innerHTML   = highlight(code);
 
