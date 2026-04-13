@@ -1,0 +1,32 @@
+{
+    "project_title": "🔭 STACK RADAR",
+    "project_subtitle": "PDF → PyMuPDF → RabbitMQ → WebSocket → Live Code",
+    "metrics": [
+        {"value": "17", "label": "STACKS", "color": "#F59E0B"},
+        {"value": "6", "label": "ENDPOINTS", "color": "#009688"},
+        {"value": "1", "label": "BROKER AMQP", "color": "#FF6600"},
+        {"value": "✔", "label": "DEPLOY OK", "color": "#00E676"}
+    ],
+    "evidences_left": [
+        "Upload PDF com drag & drop",
+        "Extração de texto via PyMuPDF",
+        "17 stacks detectáveis automaticamente",
+        "Producer publica mensagens durable"
+    ],
+    "evidences_right": [
+        "Consumer com prefetch=1 e ACK manual",
+        "WebSocket entrega eventos em tempo real",
+        "Code viewer com syntax highlighting",
+        "Deploy funcional no Railway"
+    ],
+    "stack": [
+        {"name": "Python", "color": "#3776AB"},
+        {"name": "FastAPI", "color": "#009688"},
+        {"name": "RabbitMQ", "color": "#FF6600"},
+        {"name": "Docker", "color": "#2496ED"},
+        {"name": "WebSocket", "color": "#F59E0B"},
+        {"name": "PyMuPDF", "color": "#4FC08D"}
+    ],
+    "accent_colors": ["#F59E0B", "#FF6600", "#009688"],
+    "footer_text": "Evidência capturada em 13/04/2026 · Python 3.12 · FastAPI 0.115 · RabbitMQ 3.13 · Windows"
+}

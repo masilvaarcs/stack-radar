@@ -201,6 +201,14 @@ stack-radar/
 
 ---
 
+## 📸 Evidência de Execução
+
+<p align="center">
+  <img src="docs/evidencia-card.svg" alt="Evidence Card" width="840"/>
+</p>
+
+---
+
 <div align="center">
 
 Desenvolvido por **Marcos Silva**
@@ -208,6 +216,6 @@ Desenvolvido por **Marcos Silva**
 [![Portfolio](https://img.shields.io/badge/Portfólio-masilvaarcs-F59E0B?style=for-the-badge&logo=googlechrome&logoColor=white)](https://masilvaarcs.github.io/portfolio-hub)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-marcosprogramador-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/marcosprogramador)
 
-<sub>stack-radar · fastapi · pika · rabbitmq · websocket · 2025</sub>
+<sub>stack-radar · fastapi · pika · rabbitmq · websocket · 2026</sub>
 
 </div>

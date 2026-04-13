@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 840 520" width="840" height="520">
+  <defs>
+    <linearGradient id="cardBg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#1a1a2e"/><stop offset="100%" style="stop-color:#16213e"/></linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#F59E0B"/><stop offset="50%" style="stop-color:#FF6600"/><stop offset="100%" style="stop-color:#009688"/></linearGradient>
+    <linearGradient id="metricBg" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#ffffff10"/><stop offset="100%" style="stop-color:#ffffff05"/></linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#000" flood-opacity="0.5"/></filter>
+    <clipPath id="faceClip"><circle cx="740" cy="393" r="45"/></clipPath>
+  </defs>
+  <rect width="840" height="520" rx="16" fill="#0d1117"/>
+  <g transform="translate(420,255) rotate(-1.5) translate(-370,-195)" filter="url(#shadow)">
+    <rect width="740" height="390" rx="16" fill="url(#cardBg)" stroke="#ffffff15" stroke-width="1"/>
+    <rect width="740" height="5" rx="3" fill="url(#accent)" y="0"/>
+
+    <!-- Title -->
+    <text x="40" y="50" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="700" fill="#fff">🔭 STACK RADAR</text>
+    <text x="40" y="74" font-family="Segoe UI,Arial,sans-serif" font-size="13" fill="#8b949e">PDF → PyMuPDF → RabbitMQ → WebSocket → Live Code</text>
+    <line x1="40" y1="90" x2="700" y2="90" stroke="#ffffff15" stroke-width="1"/>
+
+    <!-- Metric Cards -->
+    <rect x="40" y="105" width="155" height="75" rx="10" fill="url(#metricBg)" stroke="#ffffff10" stroke-width="1"/>
+    <text x="117" y="143" font-family="Segoe UI,Arial,sans-serif" font-size="30" font-weight="700" fill="#F59E0B" text-anchor="middle">17</text>
+    <text x="117" y="165" font-family="Segoe UI,Arial,sans-serif" font-size="11" fill="#8b949e" text-anchor="middle">STACKS</text>
+
+    <rect x="210" y="105" width="155" height="75" rx="10" fill="url(#metricBg)" stroke="#ffffff10" stroke-width="1"/>
+    <text x="287" y="143" font-family="Segoe UI,Arial,sans-serif" font-size="30" font-weight="700" fill="#009688" text-anchor="middle">6</text>
+    <text x="287" y="165" font-family="Segoe UI,Arial,sans-serif" font-size="11" fill="#8b949e" text-anchor="middle">ENDPOINTS</text>
+
+    <rect x="380" y="105" width="155" height="75" rx="10" fill="url(#metricBg)" stroke="#ffffff10" stroke-width="1"/>
+    <text x="457" y="143" font-family="Segoe UI,Arial,sans-serif" font-size="30" font-weight="700" fill="#FF6600" text-anchor="middle">1</text>
+    <text x="457" y="165" font-family="Segoe UI,Arial,sans-serif" font-size="11" fill="#8b949e" text-anchor="middle">BROKER AMQP</text>
+
+    <rect x="550" y="105" width="155" height="75" rx="10" fill="url(#metricBg)" stroke="#ffffff10" stroke-width="1"/>
+    <text x="627" y="143" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="700" fill="#00E676" text-anchor="middle">&#10004;</text>
+    <text x="627" y="165" font-family="Segoe UI,Arial,sans-serif" font-size="11" fill="#8b949e" text-anchor="middle">DEPLOY OK</text>
+
+    <!-- Evidence Section Title -->
+    <text x="40" y="216" font-family="Segoe UI,Arial,sans-serif" font-size="12" font-weight="600" fill="#F59E0B" letter-spacing="2">EVID&#202;NCIAS DE EXECU&#199;&#195;O</text>
+
+    <!-- Evidence Column 1 -->
+    <circle cx="52" cy="240" r="3.5" fill="#00E676"/><text x="63" y="244" font-family="Segoe UI,Arial,sans-serif" font-size="12.5" fill="#c9d1d9">Upload PDF com drag &amp; drop</text>
+    <circle cx="52" cy="262" r="3.5" fill="#00E676"/><text x="63" y="266" font-family="Segoe UI,Arial,sans-serif" font-size="12.5" fill="#c9d1d9">Extração de texto via PyMuPDF</text>
+    <circle cx="52" cy="284" r="3.5" fill="#00E676"/><text x="63" y="288" font-family="Segoe UI,Arial,sans-serif" font-size="12.5" fill="#c9d1d9">17 stacks detectáveis automaticamente</text>
+    <circle cx="52" cy="306" r="3.5" fill="#00E676"/><text x="63" y="310" font-family="Segoe UI,Arial,sans-serif" font-size="12.5" fill="#c9d1d9">Producer publica mensagens durable</text>
+
+    <!-- Evidence Column 2 -->
+    <circle cx="400" cy="240" r="3.5" fill="#00E676"/><text x="411" y="244" font-family="Segoe UI,Arial,sans-serif" font-size="12.5" fill="#c9d1d9">Consumer com prefetch=1 e ACK manual</text>
+    <circle cx="400" cy="262" r="3.5" fill="#00E676"/><text x="411" y="266" font-family="Segoe UI,Arial,sans-serif" font-size="12.5" fill="#c9d1d9">WebSocket entrega eventos em tempo real</text>
+    <circle cx="400" cy="284" r="3.5" fill="#00E676"/><text x="411" y="288" font-family="Segoe UI,Arial,sans-serif" font-size="12.5" fill="#c9d1d9">Code viewer com syntax highlighting</text>
+    <circle cx="400" cy="306" r="3.5" fill="#00E676"/><text x="411" y="310" font-family="Segoe UI,Arial,sans-serif" font-size="12.5" fill="#c9d1d9">Deploy funcional no Railway</text>
+
+    <!-- Stack Tags -->
+    <line x1="40" y1="330" x2="700" y2="330" stroke="#ffffff10" stroke-width="1"/>
+    <text x="40" y="355" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#8b949e">STACK</text>
+    <rect x="78" y="343" width="50" height="18" rx="9" fill="#3776AB"/><text x="103" y="355" font-family="Segoe UI,Arial,sans-serif" font-size="9" fill="#fff" text-anchor="middle">Python</text>
+    <rect x="132" y="343" width="56" height="18" rx="9" fill="#009688"/><text x="160" y="355" font-family="Segoe UI,Arial,sans-serif" font-size="9" fill="#fff" text-anchor="middle">FastAPI</text>
+    <rect x="192" y="343" width="62" height="18" rx="9" fill="#FF6600"/><text x="223" y="355" font-family="Segoe UI,Arial,sans-serif" font-size="9" fill="#fff" text-anchor="middle">RabbitMQ</text>
+    <rect x="258" y="343" width="50" height="18" rx="9" fill="#2496ED"/><text x="283" y="355" font-family="Segoe UI,Arial,sans-serif" font-size="9" fill="#fff" text-anchor="middle">Docker</text>
+    <rect x="312" y="343" width="68" height="18" rx="9" fill="#F59E0B"/><text x="346" y="355" font-family="Segoe UI,Arial,sans-serif" font-size="9" fill="#fff" text-anchor="middle">WebSocket</text>
+    <rect x="384" y="343" width="56" height="18" rx="9" fill="#4FC08D"/><text x="412" y="355" font-family="Segoe UI,Arial,sans-serif" font-size="9" fill="#fff" text-anchor="middle">PyMuPDF</text>
+    <text x="630" y="378" font-family="Segoe UI,Arial,sans-serif" font-size="11" fill="#6e7681" text-anchor="end">Marcos Silva &#183; Full Stack S&#234;nior</text>
+  </g>
+  <g>
+    <image xlink:href="data:image/jpeg;base64,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" x="695" y="348" width="90" height="90" clip-path="url(#faceClip)"/>
+    <circle cx="740" cy="393" r="45" fill="none" stroke="#2a3a5e" stroke-width="2"/>
+    <rect x="702" y="322" width="76" height="19" rx="9" fill="#00E676" opacity="0.95"/>
+    <text x="740" y="335" font-family="Segoe UI,Arial,sans-serif" font-size="9.5" font-weight="700" fill="#0d1117" text-anchor="middle" letter-spacing="0.8">&#10004; APROVADO</text>
+  </g>
+  <text x="420" y="507" font-family="Segoe UI,Arial,sans-serif" font-size="10.5" fill="#484f58" text-anchor="middle">Evidência capturada em 13/04/2026 · Python 3.12 · FastAPI 0.115 · RabbitMQ 3.13 · Windows</text>
+</svg>
