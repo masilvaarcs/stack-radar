@@ -29,3 +29,6 @@ tabelas/*.csv
 
 # LinkedIn posts (temporários, não versionar)
 docs/LINKEDIN_POST.md
+
+# Backups de imagens
+__old.7z

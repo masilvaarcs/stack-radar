@@ -17,6 +17,10 @@
 
 <br>
 
+### 🚀 [Acesse o App ao Vivo →  https://heroic-renewal-linkedinrepo.up.railway.app/](https://heroic-renewal-linkedinrepo.up.railway.app/)
+
+<br>
+
 <table>
 <tr>
 <td align="center" width="120"><b>📄</b><br><sub>PDF Upload</sub></td>
@@ -93,6 +97,12 @@ Browser
 
 ## 🚀 Quick Start
 
+### 🌐 App Live (sem instalar nada)
+
+> **https://heroic-renewal-linkedinrepo.up.railway.app/**
+>
+> Escolha um dos 5 demos ou faça upload do seu currículo em PDF.
+
 ### Com Docker Compose (recomendado)
 
 ```bash
@@ -146,6 +156,17 @@ uvicorn main:app --reload --port 8000
 - **Drag & drop** — arraste PDF diretamente na upload zone
 - **Dashboard ATS** — score de 0-100 com 6 dimensões, sugestões priorizadas por impacto
 - **Multi-formato** — reconhece seções em PT-BR e EN (incluindo PDFs exportados do LinkedIn)
+- **5 demos interativos** — TI, Saúde, Design, Educação e Finanças, sem precisar de PDF
+
+### 🎯 Demos Interativos (v2.2)
+
+| Perfil | Área | Stacks | Tipo de Conteúdo |
+|--------|------|--------|-----------------|
+| 💻 Dev Full-Stack Sênior | TI | 17 | Código real (Python, React, Docker...) |
+| 🏥 Profissional de Saúde | Saúde | 5 | Protocolos (SAE, NRS-2002, Biossegurança...) |
+| 🎨 Designer / UX | Artes & Design | 5 | Frameworks (Design Tokens, WCAG, Wireframes...) |
+| 📚 Professor / Educador | Educação | 5 | Metodologias (BNCC, PBL, Sala Invertida, PEI...) |
+| 💰 Analista Financeiro | Finanças | 5 | Análises (DRE, DCF, Fluxo de Caixa, Tributário...) |
 
 ---
 
@@ -212,8 +233,10 @@ stack-radar/
 ├── tabelas/
 │   └── stacks_taxonomy.json ← 228 competências em 8 áreas + config ATS
 ├── docs/
+│   ├── LINKEDIN_POST.md     ← Publicação LinkedIn pronta para uso
 │   ├── card_config.json     ← config do evidence card
-│   └── evidencia-card.svg   ← card de evidência (README)
+│   ├── evidencia-card.svg   ← card de evidência (README)
+│   └── imagens/             ← 13 screenshots do app em ação
 ├── frontend/
 │   └── index.html           ← UI completa (HTML + CSS + JS)
 ├── Dockerfile               ← build produção (Railway)
@@ -235,11 +258,25 @@ stack-radar/
 
 ---
 
-## 📸 Evidência de Execução
+## 📸 Evidências de Execução
 
 <p align="center">
   <img src="docs/evidencia-card.svg" alt="Evidence Card" width="840"/>
 </p>
+
+### Screenshots do App
+
+| Screenshot | Descrição |
+|-----------|-----------|
+| ![Header](docs/imagens/01-header-pipeline-visual.png) | Header com pipeline visual animado |
+| ![5 Demos](docs/imagens/02-upload-zone-5-demos.png) | Upload zone + 5 cards de demo |
+| ![ATS Dashboard](docs/imagens/04-demo-ti-ats-dashboard.png) | Dashboard ATS: score 72 + 6 dimensões |
+| ![Stacks Grid](docs/imagens/06-demo-ti-stacks-grid-17.png) | Grid de 17 stacks com filtros |
+| ![Code Viewer](docs/imagens/07-demo-ti-code-viewer-python.png) | Code Viewer Python + "Você Sabia?" |
+| ![Educação](docs/imagens/10-demo-educacao-selecionado.png) | Demo Educação — multi-área |
+| ![PDF Real](docs/imagens/09-upload-pdf-real-resultado.png) | Resultado de CV real: 10 stacks |
+
+> Veja todas as 13 screenshots em [`docs/imagens/`](docs/imagens/)
 
 ---
 
