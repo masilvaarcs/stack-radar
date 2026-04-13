@@ -100,6 +100,47 @@
     /* ───── Responsive ───── */
     @media(max-width:768px){.feature-row{grid-template-columns:1fr}.feature-row.reverse{direction:ltr}.stats-bar{grid-template-columns:repeat(2,1fr)}.showcase-grid{grid-template-columns:1fr}.demo-section{grid-template-columns:repeat(2,1fr)}.areas-grid{grid-template-columns:1fr}}
     @media(max-width:480px){.stats-bar{grid-template-columns:1fr}.demo-section{grid-template-columns:1fr}}
+
+    /* ───── Print / PDF ───── */
+    @media print{
+      @page{size:landscape;margin:10mm 12mm}
+      *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}
+      body{background:#0a0f0d!important;overflow:visible}
+
+      /* Page 1: Hero + Stats juntos */
+      .hero{min-height:auto;padding:2rem 2rem 1rem;break-after:avoid}
+      .hero::before{display:none}
+      .hero-cta{box-shadow:none}
+      section{padding:1.5rem 1.5rem;break-inside:avoid}
+      .stats-bar{margin:1rem 0;break-after:page}
+
+      /* Page 2-3: Screenshots grid */
+      .showcase-grid{grid-template-columns:repeat(3,1fr);gap:1.2rem;break-after:page}
+      .shot-img-wrap{height:170px}
+      .shot-card{break-inside:avoid;box-shadow:none}
+      .shot-card:hover{transform:none}
+
+      /* Page 4-5: Feature rows */
+      .feature-row{break-inside:avoid;margin-bottom:1.5rem;gap:1.5rem}
+      .feature-row + .feature-row.reverse{break-before:page}
+      .feature-image img{box-shadow:none}
+
+      /* Demos: título + cards na mesma página */
+      .demo-section{grid-template-columns:repeat(5,1fr);break-inside:avoid;break-after:page}
+
+      /* Areas */
+      .areas-grid{grid-template-columns:repeat(2,1fr)}
+
+      /* Timeline + Footer juntos na última página */
+      .timeline{break-inside:avoid}
+      .timeline-item{break-inside:avoid}
+      footer{padding:1.5rem 2rem}
+      .footer-cta{box-shadow:none}
+
+      /* Prevent orphan breaks */
+      h2,h3,h4{break-after:avoid}
+      .section-label,.section-title,.section-desc{break-after:avoid}
+    }
   </style>
 </head>
 <body>

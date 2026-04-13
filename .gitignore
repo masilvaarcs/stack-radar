@@ -30,5 +30,9 @@ tabelas/*.csv
 # LinkedIn posts (temporários, não versionar)
 docs/LINKEDIN_POST.md
 
+# Node (Puppeteer para geração de PDF)
+node_modules/
+package*.json
+
 # Backups de imagens
 __old.7z
