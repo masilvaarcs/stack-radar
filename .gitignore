@@ -24,5 +24,8 @@ rabbit_data/
 # Uploads temporários
 *.pdf
 
+# CSVs auxiliares de mapeamento
+tabelas/*.csv
+
 # LinkedIn posts (temporários, não versionar)
 docs/LINKEDIN_POST.md

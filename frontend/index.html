@@ -1066,7 +1066,7 @@ async function pipelineReal(file) {
   }
 
   // Inicializa cards como "pendentes"
-  stacksAll = stacksInfo.map(s => ({ id: s.id, name: s.name, icon: s.icon, area: s.area||'', ...(DEMO_DB[s.id]||{}) }));
+  stacksAll = stacksInfo.map(s => ({ ...s, ...(DEMO_DB[s.id]||{}), id: s.id, color: s.color || (DEMO_DB[s.id]||{}).color || '#888', category: s.category || (DEMO_DB[s.id]||{}).category || '', area: s.area||'' }));
   renderGrid(stacksAll);
 
   // 2. Conecta WebSocket ANTES de disparar o pipeline
@@ -1122,6 +1122,8 @@ function conectarWS(sid) {
             if (r.ok) stackData = await r.json();
           } catch {}
         }
+        // Garante que stackData sempre tenha id
+        stackData.id = msg.stack_id;
 
         stacksReady.push(stackData);
         marcarCardPronto(msg.stack_id, stackData);
@@ -1180,7 +1182,7 @@ async function pipelineDemo(comPDF = false, file = null) {
   processados = 0;
 
   activarNode('p-pdf', 'pc1');
-  if (comPDF && file) log(`📋 PDF: ${file.name}`, 'i');
+  log(comPDF && file ? `📋 PDF: ${file.name}` : '📄 Carregando currículo demo...', 'i');
   await sleep(400);
 
   activarNode('p-ext', 'pc2');
@@ -1298,6 +1300,9 @@ async function modoDemo() {
 // ═══════════════════════════════════════════════════════════════
 function resetUI() {
   stacksAll=[]; stacksReady=[]; stackAtiva=null; processados=0; logCount=0;
+  // Fecha WebSocket ativo para não corromper o novo pipeline
+  if (ws && ws.readyState <= 1) { try { ws.close(); } catch {} }
+  ws = null;
   document.getElementById('stacks-section').style.display='none';
   document.getElementById('viewer').style.display='none';
   document.getElementById('qbadge').style.display='none';
@@ -1465,9 +1470,10 @@ function renderGrid(stacks, filtro='Todos') {
     const proc   = !pronta && processados < totalStacks;
     const sel    = stackAtiva===s.id;
     const eid = esc(s.id);
+    const cor = s.color || 'var(--amber)';
     return `
       <div class="scard ${pronta?'ready':''} ${sel?'selected':''}"
-           style="--sc:${esc(s.color)||'var(--amber)'}; animation-delay:${i*50}ms"
+           style="--sc:${esc(cor)}; animation-delay:${i*50}ms"
            id="card-${eid}" onclick="selecionarStack('${eid}')">
         <div class="spin-ring"><div class="spin"></div></div>
         <div class="cdot"></div>
@@ -1485,6 +1491,9 @@ function marcarCardPronto(stackId, data) {
     card.classList.add('ready');
     card.style.setProperty('--sc', data.color||'var(--amber)');
   }
+  // Garante que o item em stacksReady tenha id
+  const sr = stacksReady.find(r=>r.id===stackId);
+  if (!sr) { data.id = stackId; }
   renderGrid(stacksAll, filtroAtivo);
 }
 
@@ -1504,7 +1513,16 @@ function atualizarTabs() {
 // ═══════════════════════════════════════════════════════════════
 function selecionarStack(id) {
   const s = stacksReady.find(s=>s.id===id);
-  if (!s) return; // ainda não processada
+  if (!s) {
+    // stack ainda não processada — feedback visual
+    const card = document.getElementById(`card-${id}`);
+    if (card) {
+      card.style.animation = 'none';
+      card.offsetHeight; // force reflow
+      card.style.animation = 'card-in .3s ease';
+    }
+    return;
+  }
   mostrarViewer(id);
 }
 
@@ -1525,11 +1543,11 @@ function mostrarViewer(id) {
   document.querySelector('.vcard').style.setProperty('--sc-active', sc);
 
   document.getElementById('vicon').textContent  = stack.icon||'📦';
-  document.getElementById('vname').textContent  = stack.name;
+  document.getElementById('vname').textContent  = stack.name||'Stack';
   document.getElementById('vsub').textContent   = stack.example_title||stack.title||'Exemplo';
   document.getElementById('vdesc').textContent  = stack.description||'';
-  document.getElementById('vbadge').textContent = stack.category||'';
-  document.getElementById('vcat').textContent   = stack.category||'';
+  document.getElementById('vbadge').textContent = stack.category||stack.area||'';
+  document.getElementById('vcat').textContent   = stack.category||stack.area||'';
 
   // Curiosity
   const curiosityBox = document.getElementById('curiosity-box');

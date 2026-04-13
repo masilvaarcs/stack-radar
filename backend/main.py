@@ -825,22 +825,32 @@ def analisar_ats(texto: str, stacks_encontradas: list[dict]) -> dict:
     total_palavras = len(palavras)
 
     # 1. Seções detectadas
-    secoes_cfg = ATS_CONFIG.get("sections_expected", [])
-    secoes = {}
+    secoes_cfg = ATS_CONFIG.get("sections_expected", {})
+    secoes: dict = {}
     score_secoes = 0
-    total_peso_secoes = sum(s.get("weight", 0) for s in secoes_cfg)
-    for sec in secoes_cfg:
+    total_peso_secoes = 0
+
+    # Suporta formato dict {key: {weight, names}} ou list [{key, weight, names}]
+    if isinstance(secoes_cfg, dict):
+        secoes_iter = secoes_cfg.items()
+    else:
+        secoes_iter = ((s["key"], s) for s in secoes_cfg)
+
+    for key, cfg in secoes_iter:
+        weight = cfg.get("weight", 5)
+        names = cfg.get("names", [key])
+        total_peso_secoes += weight
         encontrada = any(
             re.search(r'(?:^|\n)\s*' + re.escape(nome), texto_lower)
-            for nome in sec["names"]
+            for nome in names
         )
-        secoes[sec["key"]] = {
+        secoes[key] = {
             "found": encontrada,
-            "weight": sec["weight"],
-            "names": sec["names"][:3],
+            "weight": weight,
+            "names": names[:3],
         }
         if encontrada:
-            score_secoes += sec["weight"]
+            score_secoes += weight
 
     # 2. Verbos de ação
     action_verbs = ATS_CONFIG.get("action_verbs", [])
@@ -854,18 +864,28 @@ def analisar_ats(texto: str, stacks_encontradas: list[dict]) -> dict:
     quant_patterns = ATS_CONFIG.get("quantifiers_patterns", [])
     metricas_quantificaveis = []
     for pat in quant_patterns:
-        matches = re.findall(pat, texto, re.IGNORECASE)
-        metricas_quantificaveis.extend(matches)
+        try:
+            matches = re.findall(pat, texto, re.IGNORECASE)
+            metricas_quantificaveis.extend(matches)
+        except re.error:
+            pass
     score_quantificaveis = min(100, len(metricas_quantificaveis) * 15)
 
     # 4. Info de contato
     contact_cfg = ATS_CONFIG.get("contact_patterns", {})
-    contato = {}
+    contato: dict = {}
     score_contato = 0
-    for key, pat in contact_cfg.items():
-        match = re.search(pat, texto, re.IGNORECASE)
-        contato[key] = bool(match)
-        if match:
+    for key, patterns in contact_cfg.items():
+        found = False
+        if isinstance(patterns, list):
+            for pat in patterns:
+                if re.search(re.escape(pat) if not any(c in pat for c in r'\.[]()+*?{}|^$') else pat, texto, re.IGNORECASE):
+                    found = True
+                    break
+        elif isinstance(patterns, str):
+            found = bool(re.search(patterns, texto, re.IGNORECASE))
+        contato[key] = found
+        if found:
             score_contato += 20
     score_contato = min(100, score_contato)
 
@@ -1219,7 +1239,17 @@ async def upload_pdf(pdf: UploadFile = File(...)):
     return {
         "session_id": session_id,
         "encontradas": len(stacks),
-        "stacks": [{"id": s["id"], "name": s["name"], "icon": s["icon"], "area": s.get("area", "")} for s in stacks],
+        "stacks": [
+            {
+                "id": s["id"],
+                "name": s["name"],
+                "icon": s["icon"],
+                "color": s.get("color", "#888"),
+                "category": s.get("category", ""),
+                "area": s.get("area", ""),
+            }
+            for s in stacks
+        ],
         "ats": ats,
     }
 
@@ -1287,4 +1317,4 @@ async def get_stack(stack_id: str):
     """Retorna exemplo completo de uma stack específica."""
     if stack_id not in ALL_STACKS:
         raise HTTPException(404, "Stack não encontrada")
-    return ALL_STACKS[stack_id]
+    return {"id": stack_id, **ALL_STACKS[stack_id]}
