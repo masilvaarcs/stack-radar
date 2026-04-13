@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stack Radar — Showcase</title>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;background:#0a0f0d;color:#e0f0e8;overflow-x:hidden}
+
+    /* ───── Hero ───── */
+    .hero{position:relative;min-height:72vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:4rem 2rem;background:linear-gradient(135deg,#0a0f0d 0%,#0d1f1a 40%,#134e3a 70%,#059669 100%);overflow:hidden}
+    .hero::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 60% 40%,rgba(5,150,105,0.15) 0%,transparent 60%),radial-gradient(circle at 20% 80%,rgba(245,158,11,0.08) 0%,transparent 40%);animation:drift 20s ease-in-out infinite alternate}
+    @keyframes drift{0%{transform:translate(0,0) rotate(0deg)}100%{transform:translate(-30px,20px) rotate(2deg)}}
+    .hero-badge{display:inline-flex;align-items:center;gap:.5rem;background:rgba(5,150,105,0.3);border:1px solid rgba(5,150,105,0.5);border-radius:999px;padding:.4rem 1.2rem;font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;color:#6ee7b7;position:relative;z-index:1;margin-bottom:1.5rem}
+    .hero h1{font-size:clamp(2.5rem,6vw,4.5rem);font-weight:800;line-height:1.1;position:relative;z-index:1;background:linear-gradient(135deg,#fff 0%,#6ee7b7 50%,#f59e0b 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .hero p{font-size:1.15rem;color:#a0c0b0;max-width:640px;margin-top:1rem;position:relative;z-index:1;line-height:1.6}
+    .hero-stack{display:flex;gap:.6rem;flex-wrap:wrap;justify-content:center;margin-top:2rem;position:relative;z-index:1}
+    .hero-stack span{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);padding:.35rem .8rem;border-radius:6px;font-size:.78rem;font-weight:600;color:#c0e0d0}
+    .hero-cta{display:inline-flex;align-items:center;gap:.5rem;margin-top:2.5rem;padding:.85rem 2.2rem;background:linear-gradient(135deg,#059669,#10b981);color:#fff;font-size:1rem;font-weight:700;border:none;border-radius:12px;text-decoration:none;position:relative;z-index:1;transition:transform .3s ease,box-shadow .3s ease;box-shadow:0 4px 20px rgba(5,150,105,0.4)}
+    .hero-cta:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 8px 30px rgba(5,150,105,0.5)}
+    .hero-pipeline{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;justify-content:center;margin-top:1.5rem;position:relative;z-index:1;font-size:.85rem;color:#6ee7b7}
+    .hero-pipeline span{background:rgba(5,150,105,0.15);border:1px solid rgba(5,150,105,0.3);padding:.3rem .7rem;border-radius:6px;font-weight:600}
+    .hero-pipeline .arrow{color:#f59e0b;font-weight:700;font-size:1.1rem;background:none;border:none;padding:0}
+
+    /* ───── Sections ───── */
+    section{max-width:1200px;margin:0 auto;padding:5rem 2rem}
+    .section-label{font-size:.75rem;letter-spacing:.15em;text-transform:uppercase;color:#10b981;font-weight:700;margin-bottom:.5rem}
+    .section-title{font-size:2.2rem;font-weight:800;margin-bottom:.5rem}
+    .section-desc{color:#88aa98;font-size:1rem;max-width:540px;margin-bottom:3rem;line-height:1.6}
+
+    /* ───── Stats bar ───── */
+    .stats-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:1.5rem;margin:3rem 0}
+    .stat-card{text-align:center;padding:1.5rem 1rem;background:rgba(20,40,30,0.5);border:1px solid rgba(5,150,105,0.15);border-radius:12px}
+    .stat-card .number{font-size:2.5rem;font-weight:800;background:linear-gradient(135deg,#059669,#10b981);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .stat-card .label{font-size:.8rem;color:#88aa98;margin-top:.3rem}
+
+    /* ───── Showcase grid ───── */
+    .showcase-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:2rem}
+    .shot-card{position:relative;border-radius:20px;overflow:hidden;background:linear-gradient(145deg,#0f1f1a 0%,#0d1a16 100%);border:1px solid rgba(5,150,105,0.2);transition:transform .4s cubic-bezier(.25,.46,.45,.94),box-shadow .4s ease}
+    .shot-card:hover{transform:translateY(-6px) scale(1.01);box-shadow:0 20px 60px rgba(5,150,105,0.25),0 0 0 1px rgba(5,150,105,0.4)}
+    .shot-img-wrap{position:relative;overflow:hidden;height:220px}
+    .clip-a .shot-img-wrap{clip-path:polygon(0 0,100% 0,100% 82%,85% 100%,0 95%)}
+    .clip-b .shot-img-wrap{clip-path:polygon(0 0,100% 0,100% 90%,70% 100%,15% 95%,0 85%)}
+    .clip-c .shot-img-wrap{clip-path:polygon(0 0,92% 0,100% 12%,100% 100%,8% 100%,0 88%)}
+    .clip-d .shot-img-wrap{clip-path:polygon(5% 0,100% 0,95% 100%,0 100%,0 8%)}
+    .clip-e .shot-img-wrap{clip-path:polygon(0 0,100% 5%,100% 95%,90% 100%,0 100%)}
+    .clip-f .shot-img-wrap{clip-path:polygon(0 0,100% 0,100% 100%,10% 100%,0 85%)}
+    .shot-img-wrap img{width:100%;height:100%;object-fit:cover;object-position:top left;transition:transform .6s ease}
+    .shot-card:hover .shot-img-wrap img{transform:scale(1.05)}
+    .shot-img-wrap::after{content:'';position:absolute;bottom:0;left:0;right:0;height:60%;background:linear-gradient(to top,rgba(15,31,26,0.9) 0%,transparent 100%);pointer-events:none}
+    .shot-info{padding:1.2rem 1.5rem 1.5rem}
+    .shot-tag{display:inline-block;background:rgba(5,150,105,0.2);color:#6ee7b7;padding:.2rem .6rem;border-radius:4px;font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem}
+    .shot-info .shot-title{font-size:1.1rem;font-weight:700;margin-bottom:.4rem;color:#f0fff8}
+    .shot-info .shot-desc{font-size:.85rem;color:#88aa98;line-height:1.5}
+
+    /* ───── Feature rows ───── */
+    .feature-row{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;margin-bottom:5rem}
+    .feature-row.reverse{direction:rtl}.feature-row.reverse>*{direction:ltr}
+    .feature-image{position:relative;border-radius:16px;overflow:hidden}
+    .feature-image img{width:100%;border-radius:16px;border:1px solid rgba(5,150,105,0.2);box-shadow:0 12px 40px rgba(0,0,0,0.4)}
+    .feature-image::before{content:'';position:absolute;top:-3px;left:-3px;width:60px;height:60px;border-top:3px solid #059669;border-left:3px solid #059669;border-radius:16px 0 0 0;z-index:2}
+    .feature-image::after{content:'';position:absolute;bottom:-3px;right:-3px;width:60px;height:60px;border-bottom:3px solid #f59e0b;border-right:3px solid #f59e0b;border-radius:0 0 16px 0;z-index:2}
+    .feature-text h3{font-size:1.6rem;font-weight:800;margin-bottom:.8rem}
+    .feature-text p{color:#88aa98;line-height:1.7;margin-bottom:1rem}
+    .feature-badges{display:flex;flex-wrap:wrap;gap:.4rem}
+    .feature-badges span{background:rgba(245,158,11,0.12);color:#f59e0b;padding:.25rem .65rem;border-radius:4px;font-size:.72rem;font-weight:600}
+
+    /* ───── Demos grid ───── */
+    .demo-section{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.5rem;margin-top:2rem}
+    .demo-card-sc{text-align:center;padding:1.8rem 1rem;background:rgba(20,40,30,0.4);border:1px solid rgba(5,150,105,0.15);border-radius:16px;transition:transform .3s ease,border-color .3s ease}
+    .demo-card-sc:hover{transform:translateY(-4px);border-color:rgba(5,150,105,0.4)}
+    .demo-card-sc .demo-icon{font-size:2.5rem;margin-bottom:.5rem;display:block}
+    .demo-card-sc .demo-name{font-size:1rem;font-weight:700;color:#f0fff8;margin-bottom:.3rem}
+    .demo-card-sc .demo-area{font-size:.78rem;color:#6ee7b7;margin-bottom:.3rem}
+    .demo-card-sc .demo-stacks{font-size:.75rem;color:#88aa98}
+
+    /* ───── Timeline ───── */
+    .timeline{position:relative;padding-left:2.5rem}
+    .timeline::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,#059669,#f59e0b)}
+    .timeline-item{position:relative;margin-bottom:2.5rem}
+    .timeline-item::before{content:'';position:absolute;left:-2.65rem;top:.35rem;width:12px;height:12px;border-radius:50%;background:#059669;border:2px solid #0a0f0d;box-shadow:0 0 0 3px rgba(5,150,105,0.3)}
+    .timeline-item h4{font-size:1rem;font-weight:700;color:#f0fff8;margin-bottom:.3rem}
+    .timeline-item p{font-size:.88rem;color:#88aa98;line-height:1.5}
+
+    /* ───── Areas table ───── */
+    .areas-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;margin-top:2rem}
+    .area-card{display:flex;align-items:center;gap:1rem;padding:1rem 1.2rem;background:rgba(20,40,30,0.4);border:1px solid rgba(5,150,105,0.12);border-radius:12px}
+    .area-card .area-icon{font-size:1.8rem;flex-shrink:0}
+    .area-card .area-name{font-size:.95rem;font-weight:700;color:#f0fff8}
+    .area-card .area-count{font-size:.78rem;color:#6ee7b7}
+
+    /* ───── Footer ───── */
+    footer{text-align:center;padding:3rem 2rem;color:#556;font-size:.8rem;border-top:1px solid rgba(5,150,105,0.1)}
+    footer a{color:#10b981;text-decoration:none}
+    footer a:hover{text-decoration:underline}
+    .footer-cta{display:inline-flex;align-items:center;gap:.4rem;margin-bottom:1.5rem;padding:.7rem 1.8rem;background:linear-gradient(135deg,#059669,#10b981);color:#fff;font-size:.9rem;font-weight:700;border-radius:10px;text-decoration:none;transition:transform .3s ease,box-shadow .3s ease;box-shadow:0 4px 16px rgba(5,150,105,0.3)}
+    .footer-cta:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(5,150,105,0.4)}
+
+    /* ───── Responsive ───── */
+    @media(max-width:768px){.feature-row{grid-template-columns:1fr}.feature-row.reverse{direction:ltr}.stats-bar{grid-template-columns:repeat(2,1fr)}.showcase-grid{grid-template-columns:1fr}.demo-section{grid-template-columns:repeat(2,1fr)}.areas-grid{grid-template-columns:1fr}}
+    @media(max-width:480px){.stats-bar{grid-template-columns:1fr}.demo-section{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+
+  <!-- ═══════ HERO ═══════ -->
+  <div class="hero">
+    <div class="hero-badge">🔭 Projeto Open Source</div>
+    <h1>Stack Radar</h1>
+    <p>Analisa currículos em PDF e detecta 228 competências profissionais em 8 áreas — com score ATS, sugestões de melhoria e pipeline de mensageria em tempo real.</p>
+    <div class="hero-pipeline">
+      <span>📄 PDF</span>
+      <span class="arrow">→</span>
+      <span>⚙️ PyMuPDF</span>
+      <span class="arrow">→</span>
+      <span>🐇 RabbitMQ</span>
+      <span class="arrow">→</span>
+      <span>⚡ WebSocket</span>
+      <span class="arrow">→</span>
+      <span>💡 Live UI</span>
+    </div>
+    <div class="hero-stack">
+      <span>Python 3.12</span>
+      <span>FastAPI</span>
+      <span>RabbitMQ</span>
+      <span>WebSocket</span>
+      <span>PyMuPDF</span>
+      <span>Docker</span>
+      <span>Railway</span>
+    </div>
+    <a class="hero-cta" href="https://heroic-renewal-linkedinrepo.up.railway.app/" target="_blank">
+      🚀 Testar Agora — App Live
+    </a>
+  </div>
+
+  <!-- ═══════ STATS ═══════ -->
+  <section>
+    <div class="stats-bar">
+      <div class="stat-card"><div class="number">228</div><div class="label">Competências</div></div>
+      <div class="stat-card"><div class="number">8</div><div class="label">Áreas Profissionais</div></div>
+      <div class="stat-card"><div class="number">5</div><div class="label">Demos Interativos</div></div>
+      <div class="stat-card"><div class="number">151</div><div class="label">Testes Passando</div></div>
+      <div class="stat-card"><div class="number">ATS</div><div class="label">Score 0–100</div></div>
+    </div>
+  </section>
+
+  <!-- ═══════ SCREENSHOTS GRID ═══════ -->
+  <section>
+    <div class="section-label">Capturas reais</div>
+    <h2 class="section-title">O app em ação</h2>
+    <p class="section-desc">Screenshots capturadas diretamente do aplicativo em funcionamento — pipeline real, ATS dashboard e demos interativos.</p>
+
+    <div class="showcase-grid">
+
+      <div class="shot-card clip-a">
+        <div class="shot-img-wrap">
+          <img src="imagens/01-header-pipeline-visual.png" alt="Header Pipeline Visual" loading="lazy" />
+        </div>
+        <div class="shot-info">
+          <span class="shot-tag">Pipeline</span>
+          <div class="shot-title">Pipeline Visual Animado</div>
+          <div class="shot-desc">Header com diagrama do pipeline: PDF → PyMuPDF → RabbitMQ → WebSocket → Live UI</div>
+        </div>
+      </div>
+
+      <div class="shot-card clip-b">
+        <div class="shot-img-wrap">
+          <img src="imagens/02-upload-zone-5-demos.png" alt="Upload Zone + 5 Demos" loading="lazy" />
+        </div>
+        <div class="shot-info">
+          <span class="shot-tag">Demos</span>
+          <div class="shot-title">Upload Zone + 5 Perfis Demo</div>
+          <div class="shot-desc">Drag & drop de PDF ou escolha entre 5 perfis: TI, Saúde, Design, Educação, Finanças</div>
+        </div>
+      </div>
+
+      <div class="shot-card clip-c">
+        <div class="shot-img-wrap">
+          <img src="imagens/04-demo-ti-ats-dashboard.png" alt="ATS Dashboard" loading="lazy" />
+        </div>
+        <div class="shot-info">
+          <span class="shot-tag">ATS</span>
+          <div class="shot-title">Dashboard ATS — Score 72</div>
+          <div class="shot-desc">Terminal live + score ATS animado com 6 barras de dimensão e classificação</div>
+        </div>
+      </div>
+
+      <div class="shot-card clip-d">
+        <div class="shot-img-wrap">
+          <img src="imagens/06-demo-ti-stacks-grid-17.png" alt="Grid de 17 Stacks TI" loading="lazy" />
+        </div>
+        <div class="shot-info">
+          <span class="shot-tag">Stacks</span>
+          <div class="shot-title">Grid de 17 Stacks — Demo TI</div>
+          <div class="shot-desc">Cards coloridos com filtro por categoria: Backend, Frontend, DevOps, Database, IA</div>
+        </div>
+      </div>
+
+      <div class="shot-card clip-e">
+        <div class="shot-img-wrap">
+          <img src="imagens/07-demo-ti-code-viewer-python.png" alt="Code Viewer Python" loading="lazy" />
+        </div>
+        <div class="shot-info">
+          <span class="shot-tag">Code</span>
+          <div class="shot-title">Code Viewer — Python</div>
+          <div class="shot-desc">Exemplo de código real com syntax highlight + curiosidade "Você Sabia?"</div>
+        </div>
+      </div>
+
+      <div class="shot-card clip-f">
+        <div class="shot-img-wrap">
+          <img src="imagens/10-demo-educacao-selecionado.png" alt="Demo Educação" loading="lazy" />
+        </div>
+        <div class="shot-info">
+          <span class="shot-tag">Multi-área</span>
+          <div class="shot-title">Demo Educação — Selecionado</div>
+          <div class="shot-desc">Perfil de professor/educador com 5 stacks pedagógicas + score ATS</div>
+        </div>
+      </div>
+
+      <div class="shot-card clip-a">
+        <div class="shot-img-wrap">
+          <img src="imagens/05-demo-ti-ats-sugestoes.png" alt="Sugestões ATS" loading="lazy" />
+        </div>
+        <div class="shot-info">
+          <span class="shot-tag">ATS</span>
+          <div class="shot-title">Sugestões de Melhoria</div>
+          <div class="shot-desc">Recomendações priorizadas por impacto: seções, verbos de ação, métricas, contato</div>
+        </div>
+      </div>
+
+      <div class="shot-card clip-b">
+        <div class="shot-img-wrap">
+          <img src="imagens/11-demo-educacao-viewer-pedagogia.png" alt="Viewer Pedagogia" loading="lazy" />
+        </div>
+        <div class="shot-info">
+          <span class="shot-tag">Educação</span>
+          <div class="shot-title">Viewer — Plano de Aula BNCC</div>
+          <div class="shot-desc">Conteúdo real de Pedagogia com exemplo de plano de aula alinhado à BNCC</div>
+        </div>
+      </div>
+
+      <div class="shot-card clip-c">
+        <div class="shot-img-wrap">
+          <img src="imagens/09-upload-pdf-real-resultado.png" alt="Resultado PDF Real" loading="lazy" />
+        </div>
+        <div class="shot-info">
+          <span class="shot-tag">Upload Real</span>
+          <div class="shot-title">Resultado — CV Real</div>
+          <div class="shot-desc">10 stacks detectadas a partir de um currículo verdadeiro em PDF</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════ FEATURE: PIPELINE ═══════ -->
+  <section>
+    <div class="section-label">Destaques</div>
+    <h2 class="section-title">Funcionalidades em detalhe</h2>
+
+    <div class="feature-row">
+      <div class="feature-image">
+        <img src="imagens/01-header-pipeline-visual.png" alt="Pipeline de Mensageria" />
+      </div>
+      <div class="feature-text">
+        <h3>Pipeline de Mensageria Real</h3>
+        <p>Cada competência detectada vira uma mensagem AMQP publicada no RabbitMQ com <code>delivery_mode=2</code> (persistente). O consumer processa uma por vez (<code>prefetch_count=1</code>) com ACK manual — e entrega via WebSocket ao browser em tempo real.</p>
+        <div class="feature-badges">
+          <span>RabbitMQ</span>
+          <span>pika</span>
+          <span>WebSocket</span>
+          <span>prefetch=1</span>
+          <span>ACK manual</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature-row reverse">
+      <div class="feature-image">
+        <img src="imagens/04-demo-ti-ats-dashboard.png" alt="ATS Dashboard" />
+      </div>
+      <div class="feature-text">
+        <h3>Analisador ATS — 6 Dimensões</h3>
+        <p>O currículo é pontuado como um ATS de verdade: seções (30%), verbos de ação (15%), métricas quantificáveis (15%), dados de contato (15%), extensão (10%), competências (15%). Score de 0 a 100 com barra animada e sugestões de melhoria priorizadas.</p>
+        <div class="feature-badges">
+          <span>Score 0–100</span>
+          <span>6 dimensões</span>
+          <span>Sugestões</span>
+          <span>PT-BR + EN</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature-row">
+      <div class="feature-image">
+        <img src="imagens/10-demo-educacao-selecionado.png" alt="Multi-área" />
+      </div>
+      <div class="feature-text">
+        <h3>228 Competências em 8 Áreas</h3>
+        <p>De TI (127 stacks) a Saúde, Educação, Design, Marketing, Finanças, Engenharia e Logística. O currículo de um enfermeiro ou professor é tão bem analisado quanto o de um desenvolvedor full stack. Cada stack tem código real ou conteúdo profissional.</p>
+        <div class="feature-badges">
+          <span>TI (127)</span>
+          <span>Saúde (25)</span>
+          <span>Educação (17)</span>
+          <span>Design (18)</span>
+          <span>Finanças (14)</span>
+          <span>Marketing (12)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature-row reverse">
+      <div class="feature-image">
+        <img src="imagens/07-demo-ti-code-viewer-python.png" alt="Code Viewer" />
+      </div>
+      <div class="feature-text">
+        <h3>Code Viewer + "Você Sabia?"</h3>
+        <p>Clique em qualquer stack para ver um exemplo de código real com syntax highlight. Cada tecnologia também exibe uma curiosidade histórica ou técnica — conteúdo educacional integrado à análise profissional.</p>
+        <div class="feature-badges">
+          <span>Syntax Highlight</span>
+          <span>Código Real</span>
+          <span>Curiosidades</span>
+          <span>Multi-linguagem</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ 5 DEMOS ═══════ -->
+  <section>
+    <div class="section-label">Demonstrações</div>
+    <h2 class="section-title">5 perfis interativos</h2>
+    <p class="section-desc">Não precisa ter um PDF para testar. Cada demo simula o pipeline completo com stacks reais da área profissional.</p>
+
+    <div class="demo-section">
+      <div class="demo-card-sc">
+        <span class="demo-icon">💻</span>
+        <div class="demo-name">Dev Full-Stack Sênior</div>
+        <div class="demo-area">Tecnologia da Informação</div>
+        <div class="demo-stacks">17 stacks · Python, React, Docker, AWS...</div>
+      </div>
+      <div class="demo-card-sc">
+        <span class="demo-icon">🏥</span>
+        <div class="demo-name">Profissional de Saúde</div>
+        <div class="demo-area">Saúde</div>
+        <div class="demo-stacks">5 stacks · Enfermagem, Nutrição, Farmácia...</div>
+      </div>
+      <div class="demo-card-sc">
+        <span class="demo-icon">🎨</span>
+        <div class="demo-name">Designer / UX</div>
+        <div class="demo-area">Artes &amp; Design</div>
+        <div class="demo-stacks">5 stacks · Figma, WCAG, Design Tokens...</div>
+      </div>
+      <div class="demo-card-sc">
+        <span class="demo-icon">📚</span>
+        <div class="demo-name">Professor / Educador</div>
+        <div class="demo-area">Educação</div>
+        <div class="demo-stacks">5 stacks · BNCC, PBL, Sala Invertida...</div>
+      </div>
+      <div class="demo-card-sc">
+        <span class="demo-icon">💰</span>
+        <div class="demo-name">Analista Financeiro</div>
+        <div class="demo-area">Finanças &amp; Gestão</div>
+        <div class="demo-stacks">5 stacks · DRE, DCF, Tributário...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ 8 ÁREAS ═══════ -->
+  <section>
+    <div class="section-label">Taxonomia</div>
+    <h2 class="section-title">8 áreas profissionais</h2>
+    <p class="section-desc">228 competências organizadas em taxonomia JSON externa, com sinônimos em PT-BR e EN.</p>
+
+    <div class="areas-grid">
+      <div class="area-card">
+        <span class="area-icon">⚙️</span>
+        <div>
+          <div class="area-name">Tecnologia da Informação</div>
+          <div class="area-count">127 stacks — Python, React, Docker, AWS, SOLID, Design Patterns</div>
+        </div>
+      </div>
+      <div class="area-card">
+        <span class="area-icon">🏥</span>
+        <div>
+          <div class="area-name">Saúde</div>
+          <div class="area-count">25 stacks — Enfermagem, Fisioterapia, Nutrição, Farmácia</div>
+        </div>
+      </div>
+      <div class="area-card">
+        <span class="area-icon">📚</span>
+        <div>
+          <div class="area-name">Educação</div>
+          <div class="area-count">17 stacks — Pedagogia, EAD, Alfabetização, Libras</div>
+        </div>
+      </div>
+      <div class="area-card">
+        <span class="area-icon">🎨</span>
+        <div>
+          <div class="area-name">Artes e Design</div>
+          <div class="area-count">18 stacks — UI/UX, Figma, Motion Design, Fotografia</div>
+        </div>
+      </div>
+      <div class="area-card">
+        <span class="area-icon">📣</span>
+        <div>
+          <div class="area-name">Marketing e Comunicação</div>
+          <div class="area-count">12 stacks — SEO, Tráfego Pago, Inbound, CRM</div>
+        </div>
+      </div>
+      <div class="area-card">
+        <span class="area-icon">💰</span>
+        <div>
+          <div class="area-name">Finanças e Gestão</div>
+          <div class="area-count">14 stacks — Contabilidade, Auditoria, FP&amp;A, Valuation</div>
+        </div>
+      </div>
+      <div class="area-card">
+        <span class="area-icon">🏗️</span>
+        <div>
+          <div class="area-name">Engenharia e Indústria</div>
+          <div class="area-count">9 stacks — Civil, Mecânica, Elétrica, Automação</div>
+        </div>
+      </div>
+      <div class="area-card">
+        <span class="area-icon">📦</span>
+        <div>
+          <div class="area-name">Logística e Supply Chain</div>
+          <div class="area-count">6 stacks — WMS, ERP, Roteirização, Última Milha</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ DESAFIOS ═══════ -->
+  <section>
+    <div class="section-label">Jornada</div>
+    <h2 class="section-title">Desafios superados</h2>
+
+    <div class="timeline">
+      <div class="timeline-item">
+        <h4>RabbitMQ com ACK manual sem perder mensagens</h4>
+        <p>Producer/consumer em threads separadas com <code>prefetch_count=1</code> e ACK manual. Mensagens persistentes (<code>durable=True</code>) sobrevivem a restarts — padrão AMQP real.</p>
+      </div>
+      <div class="timeline-item">
+        <h4>WebSocket entregando resultados ao vivo</h4>
+        <p>Consumer RabbitMQ envia mensagens para o loop asyncio do FastAPI via <code>run_coroutine_threadsafe</code>. O browser recebe cada stack processada sem polling — conexão bidirecional real.</p>
+      </div>
+      <div class="timeline-item">
+        <h4>De 17 stacks para 228 competências em 8 áreas</h4>
+        <p>Taxonomia JSON externa com aliases, sinônimos PT-BR/EN, categorias e subcategorias. Currículos de saúde, educação e finanças detectados com a mesma precisão que TI.</p>
+      </div>
+      <div class="timeline-item">
+        <h4>Motor ATS com 6 dimensões ponderadas</h4>
+        <p>Scoring engine que avalia seções (30%), verbos de ação (15%), métricas (15%), contato (15%), extensão (10%) e competências (15%). Mapeia seções em PT-BR e EN — incluindo PDFs do LinkedIn.</p>
+      </div>
+      <div class="timeline-item">
+        <h4>5 demos sem backend — simulação local completa</h4>
+        <p>Cada perfil demo (TI, Saúde, Design, Educação, Finanças) gera stacks com código/conteúdo real e simula o pipeline completo — incluindo ATS scoring — sem requisitar o servidor.</p>
+      </div>
+      <div class="timeline-item">
+        <h4>Deploy Railway com Docker non-root</h4>
+        <p>Dockerfile com usuário não-root, healthcheck no RabbitMQ, <code>railway.json</code> configurado. 10 camadas de segurança: CORS, headers, validação XSS, UUID para sessões.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ FOOTER ═══════ -->
+  <footer>
+    <a class="footer-cta" href="https://heroic-renewal-linkedinrepo.up.railway.app/" target="_blank">
+      🚀 Acesse o App Live
+    </a>
+    <p>Criado por <strong>Marcos Silva</strong> &mdash;
+      <a href="https://www.linkedin.com/in/marcosprogramador/" target="_blank">LinkedIn</a> &middot;
+      <a href="https://github.com/masilvaarcs" target="_blank">GitHub</a> &middot;
+      <a href="https://masilvaarcs.github.io/portfolio-hub/" target="_blank">Portfolio</a>
+    </p>
+    <p style="margin-top:.5rem">
+      <a href="https://github.com/masilvaarcs/stack-radar">github.com/masilvaarcs/stack-radar</a>
+    </p>
+  </footer>
+
+</body>
+</html>

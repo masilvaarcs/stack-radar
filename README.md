@@ -233,6 +233,7 @@ stack-radar/
 ├── tabelas/
 │   └── stacks_taxonomy.json ← 228 competências em 8 áreas + config ATS
 ├── docs/
+│   ├── SHOWCASE.html        ← Showcase visual do projeto (abra no browser)
 │   ├── LINKEDIN_POST.md     ← Publicação LinkedIn pronta para uso
 │   ├── card_config.json     ← config do evidence card
 │   ├── evidencia-card.svg   ← card de evidência (README)
