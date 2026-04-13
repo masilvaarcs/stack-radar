@@ -1,0 +1,39 @@
+services:
+
+  # ── RabbitMQ ─────────────────────────────────────────────────────────────────
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: stack-radar-rabbit
+    ports:
+      - "5672:5672"       # AMQP
+      - "15672:15672"     # Management UI → http://localhost:15672 (guest/guest)
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - rabbit_data:/var/lib/rabbitmq
+
+  # ── Backend Python (FastAPI) ─────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: stack-radar-api
+    ports:
+      - "8000:8000"
+    environment:
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    volumes:
+      - ./frontend:/app/frontend:ro   # serve o HTML estático
+    restart: unless-stopped
+
+volumes:
+  rabbit_data:

@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stack Radar — PDF → RabbitMQ → Code</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;0,700;1,400&family=Bricolage+Grotesque:wght@300;400;600;800&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════
+   DESIGN SYSTEM
+═══════════════════════════════════════════════════ */
+:root {
+  --bg:      #07080d;
+  --bg2:     #0c0e18;
+  --surface: rgba(255,255,255,0.035);
+  --sur2:    rgba(255,255,255,0.065);
+  --border:  rgba(255,255,255,0.07);
+  --bord2:   rgba(255,255,255,0.13);
+  --text:    #dde2f0;
+  --muted:   #4a5070;
+  --muted2:  #6b7290;
+
+  --amber:    #f59e0b;
+  --amber-g:  rgba(245,158,11,0.18);
+  --amber-d:  rgba(245,158,11,0.07);
+  --green:    #10b981;
+  --green-d:  rgba(16,185,129,0.1);
+  --red:      #f87171;
+  --blue:     #60a5fa;
+  --purple:   #a78bfa;
+
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Bricolage Grotesque', sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(ellipse 70% 50% at 10% 0%,  rgba(245,158,11,.1)  0%, transparent 55%),
+    radial-gradient(ellipse 50% 60% at 90% 100%, rgba(96,165,250,.07) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 40% at 50% 50%,  rgba(167,139,250,.04)0%, transparent 60%);
+}
+body::after {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.011) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.011) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+.z1 { position: relative; z-index: 1; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 4px; }
+.wrap { max-width: 1060px; margin: 0 auto; padding: 0 1.5rem; }
+
+/* ═══════════════════════════════════════════════════
+   HEADER
+═══════════════════════════════════════════════════ */
+header { padding: 3rem 0 1.5rem; text-align: center; position: relative; z-index: 1; }
+.logo-row { display: flex; align-items: center; justify-content: center; gap: .8rem; margin-bottom: .8rem; }
+.logo-icon {
+  font-size: 2.2rem;
+  filter: drop-shadow(0 0 18px rgba(245,158,11,.9));
+  animation: pulse-icon 3s ease-in-out infinite;
+}
+@keyframes pulse-icon {
+  0%,100% { filter: drop-shadow(0 0 14px rgba(245,158,11,.7)); }
+  50%      { filter: drop-shadow(0 0 30px rgba(245,158,11,1)); }
+}
+h1 {
+  font-family: var(--sans); font-weight: 800; font-size: 2.6rem; letter-spacing: -2px;
+  background: linear-gradient(135deg,#fff 10%,var(--amber) 55%,#f97316 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.tagline { font-family: var(--mono); font-size: .7rem; color: var(--muted2); letter-spacing: 3px; text-transform: uppercase; margin-top: .4rem; }
+
+/* ═══════════════════════════════════════════════════
+   PIPELINE DIAGRAM (header visual)
+═══════════════════════════════════════════════════ */
+.pipeline {
+  display: flex; align-items: center; justify-content: center;
+  gap: 0; padding: 1.4rem 0 1rem; flex-wrap: wrap; row-gap: .6rem;
+}
+.pnode { display: flex; flex-direction: column; align-items: center; gap: .4rem; min-width: 80px; }
+.pbox {
+  width: 54px; height: 54px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
+  transition: all .4s ease;
+}
+.pbox.pdf   { background: rgba(239,68,68,.12);  border: 1px solid rgba(239,68,68,.3); }
+.pbox.prod  { background: rgba(16,185,129,.10); border: 1px solid rgba(16,185,129,.3); }
+.pbox.queue { background: rgba(245,158,11,.10); border: 1px solid rgba(245,158,11,.35); }
+.pbox.cons  { background: rgba(96,165,250,.10); border: 1px solid rgba(96,165,250,.3); }
+.pbox.out   { background: rgba(167,139,250,.10);border: 1px solid rgba(167,139,250,.3); }
+.pbox.active { box-shadow: 0 0 0 2px currentColor, 0 0 20px rgba(245,158,11,.4); transform: scale(1.1); }
+.plabel { font-family: var(--mono); font-size: .6rem; color: var(--muted2); text-align: center; }
+.pconn {
+  flex: 1; max-width: 70px; min-width: 24px; height: 2px;
+  background: var(--border); position: relative; overflow: hidden;
+}
+.pconn::after {
+  content: ''; position: absolute; top:0; left: -60%; width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, var(--amber), transparent);
+  animation: flow 2s linear infinite;
+}
+.pconn.active::after { background: linear-gradient(90deg, transparent, var(--green), transparent); }
+@keyframes flow { 0%{left:-60%;opacity:0} 20%{opacity:1} 80%{opacity:1} 100%{left:120%;opacity:0} }
+.qdots { display: flex; gap: 3px; }
+.qdot { width: 5px; height: 5px; border-radius: 50%; background: var(--amber); animation: blink 1.2s ease-in-out infinite; }
+.qdot:nth-child(2){animation-delay:.2s}
+.qdot:nth-child(3){animation-delay:.4s}
+@keyframes blink { 0%,100%{opacity:.2;transform:scale(.8)} 50%{opacity:1;transform:scale(1.3)} }
+
+/* ═══════════════════════════════════════════════════
+   UPLOAD
+═══════════════════════════════════════════════════ */
+.upload-section { padding: .5rem 0 1.5rem; }
+.upload-zone {
+  border: 2px dashed var(--bord2); border-radius: 20px; padding: 2.5rem 2rem;
+  text-align: center; cursor: pointer; transition: all .3s ease;
+  background: var(--surface); backdrop-filter: blur(10px); position: relative; overflow: hidden;
+}
+.upload-zone::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(245,158,11,.04), transparent);
+  opacity: 0; transition: opacity .3s;
+}
+.upload-zone:hover, .upload-zone.drag-over {
+  border-color: rgba(245,158,11,.5); background: rgba(245,158,11,.04);
+}
+.upload-zone:hover::before, .upload-zone.drag-over::before { opacity: 1; }
+.uicon { font-size: 2.5rem; margin-bottom: .8rem; }
+.utitle { font-size: 1.1rem; font-weight: 600; color: #fff; margin-bottom: .3rem; }
+.usub { font-family: var(--mono); font-size: .72rem; color: var(--muted); }
+.urow { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
+.ubtn {
+  display: inline-flex; align-items: center; gap: .45rem;
+  padding: .6rem 1.4rem; background: var(--amber-d); border: 1px solid rgba(245,158,11,.35);
+  border-radius: 100px; color: var(--amber); font-family: var(--mono); font-size: .78rem;
+  font-weight: 600; cursor: pointer; transition: all .2s; letter-spacing: .5px;
+}
+.ubtn:hover { background: rgba(245,158,11,.15); box-shadow: 0 0 18px rgba(245,158,11,.2); }
+.or { font-family: var(--mono); font-size: .68rem; color: var(--muted); }
+.dbtn {
+  padding: .5rem 1.1rem; background: var(--sur2); border: 1px solid var(--bord2);
+  border-radius: 100px; color: var(--muted2); font-family: var(--mono); font-size: .72rem;
+  cursor: pointer; transition: all .2s;
+}
+.dbtn:hover { color: var(--purple); border-color: rgba(167,139,250,.35); background: rgba(167,139,250,.07); }
+#file-input { display: none; }
+
+/* Server status pill */
+.server-status {
+  display: inline-flex; align-items: center; gap: .5rem;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 100px; padding: .3rem .9rem;
+  font-family: var(--mono); font-size: .68rem; color: var(--muted2);
+  margin-bottom: 1.2rem;
+}
+.status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
+.status-dot.online { background: var(--green); box-shadow: 0 0 8px rgba(16,185,129,.6); animation: blink 2s infinite; }
+.status-dot.offline { background: var(--red); }
+
+/* ═══════════════════════════════════════════════════
+   TERMINAL LOG
+═══════════════════════════════════════════════════ */
+.terminal {
+  background: rgba(0,0,0,.55); border: 1px solid var(--border);
+  border-radius: 12px; margin-bottom: 1.5rem; overflow: hidden;
+  display: none;
+}
+.term-head {
+  background: rgba(255,255,255,.03); border-bottom: 1px solid var(--border);
+  padding: .55rem 1rem; display: flex; align-items: center; gap: .45rem;
+}
+.tdot { width: 10px; height: 10px; border-radius: 50%; }
+.tdot.r{background:#ef4444} .tdot.y{background:#f59e0b} .tdot.g{background:#22c55e}
+.tlabel { font-family: var(--mono); font-size: .7rem; color: var(--muted2); margin-left: .3rem; flex: 1; }
+.tcount { font-family: var(--mono); font-size: .67rem; color: var(--muted); }
+.term-body {
+  padding: .9rem 1.2rem; font-family: var(--mono); font-size: .76rem;
+  line-height: 1.9; min-height: 60px; max-height: 220px; overflow-y: auto;
+}
+.ll { opacity: 0; animation: fi .25s forwards; }
+.li{color:var(--blue)} .lk{color:var(--green)} .lw{color:var(--amber)} .le{color:var(--red)} .ld{color:var(--muted2)}
+@keyframes fi { to{opacity:1} }
+
+/* ═══════════════════════════════════════════════════
+   QUEUE COUNTER BADGE
+═══════════════════════════════════════════════════ */
+.queue-badge {
+  display: inline-flex; align-items: center; gap: .6rem;
+  background: var(--amber-d); border: 1px solid rgba(245,158,11,.25);
+  border-radius: 10px; padding: .6rem 1rem;
+  font-family: var(--mono); font-size: .75rem; color: var(--amber);
+  margin-bottom: 1.2rem; display: none;
+}
+.qb-bar { flex: 1; height: 4px; background: rgba(245,158,11,.15); border-radius: 2px; min-width: 100px; }
+.qb-fill { height: 100%; background: var(--amber); border-radius: 2px; transition: width .4s ease; width: 0%; }
+
+/* ═══════════════════════════════════════════════════
+   STACKS GRID
+═══════════════════════════════════════════════════ */
+#stacks-section { display: none; }
+.sec-head { display: flex; align-items: baseline; gap: .8rem; margin-bottom: 1rem; }
+.sec-title { font-size: 1.1rem; font-weight: 700; color: #fff; }
+.sec-count { font-family: var(--mono); font-size: .7rem; color: var(--muted2); }
+.filter-row { display: flex; gap: .45rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.fbtn {
+  padding: .3rem .8rem; border-radius: 100px; border: 1px solid var(--border);
+  background: var(--surface); color: var(--muted2); font-family: var(--mono); font-size: .68rem;
+  cursor: pointer; transition: all .2s;
+}
+.fbtn:hover { border-color: var(--bord2); color: var(--text); }
+.fbtn.on { background: var(--amber-d); border-color: rgba(245,158,11,.4); color: var(--amber); }
+
+.stacks-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(165px,1fr));
+  gap: .75rem; margin-bottom: 2.5rem;
+}
+
+/* Card states */
+.scard {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 1rem 1.1rem; cursor: pointer;
+  transition: all .25s cubic-bezier(.4,0,.2,1);
+  position: relative; overflow: hidden;
+  /* pending state — dim */
+  opacity: .35; filter: grayscale(.8);
+}
+.scard.ready { opacity: 1; filter: none; animation: card-in .4s ease both; }
+.scard.ready::before {
+  content: ''; position: absolute; top:0;left:0;right:0;height:1px;
+  background: linear-gradient(90deg,transparent,rgba(255,255,255,.08),transparent);
+}
+.scard.ready:hover { transform: translateY(-3px); border-color: var(--bord2); box-shadow: 0 12px 40px rgba(0,0,0,.4); }
+.scard.selected {
+  border-color: var(--sc,var(--amber));
+  box-shadow: 0 0 0 1px var(--sc,var(--amber)), 0 12px 40px rgba(0,0,0,.4);
+  background: color-mix(in srgb, var(--sc,var(--amber)) 7%, transparent);
+}
+@keyframes card-in { from{opacity:0;transform:translateY(10px) scale(.97)} to{opacity:1;transform:none} }
+
+/* Processing spinner overlay */
+.scard .spin-ring {
+  position: absolute; inset: 0; display: none;
+  align-items: center; justify-content: center;
+  background: rgba(7,8,13,.7); border-radius: 14px;
+}
+.scard.processing .spin-ring { display: flex; }
+.spin {
+  width: 28px; height: 28px; border: 2px solid var(--border);
+  border-top-color: var(--amber); border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to{transform:rotate(360deg)} }
+
+.cdot {
+  position: absolute; top: .75rem; right: .75rem;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--sc,var(--amber)); opacity: .6;
+}
+.scard.ready .cdot { animation: pulse-dot 2s ease-in-out infinite; }
+@keyframes pulse-dot { 0%,100%{transform:scale(1);opacity:.6} 50%{transform:scale(1.5);opacity:1} }
+
+.cicon { font-size: 1.65rem; margin-bottom: .45rem; }
+.cname { font-weight: 700; font-size: .88rem; color: #fff; margin-bottom: .15rem; }
+.ccat  { font-family: var(--mono); font-size: .6rem; color: var(--muted2); text-transform: uppercase; letter-spacing: 1px; }
+
+/* ═══════════════════════════════════════════════════
+   CODE VIEWER
+═══════════════════════════════════════════════════ */
+#viewer { display: none; margin-bottom: 4rem; }
+.vcard {
+  background: rgba(0,0,0,.5); border: 1px solid var(--border); border-radius: 18px;
+  overflow: hidden; backdrop-filter: blur(12px);
+  animation: slide-up .35s cubic-bezier(.4,0,.2,1);
+}
+@keyframes slide-up { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:none} }
+
+/* Tab bar para selecionar stack no viewer */
+.vtabs {
+  background: rgba(255,255,255,.02); border-bottom: 1px solid var(--border);
+  padding: 0 1.2rem; display: flex; gap: 0; overflow-x: auto;
+}
+.vtab {
+  padding: .75rem 1.1rem; font-family: var(--mono); font-size: .72rem; color: var(--muted2);
+  cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap;
+  transition: all .2s; user-select: none;
+}
+.vtab:hover { color: var(--text); }
+.vtab.active { color: var(--amber); border-bottom-color: var(--amber); }
+
+.vheader {
+  background: rgba(255,255,255,.025); border-bottom: 1px solid var(--border);
+  padding: .9rem 1.2rem; display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: .7rem;
+}
+.vleft { display: flex; align-items: center; gap: .8rem; }
+.vicon { font-size: 1.7rem; }
+.vname { font-size: 1rem; font-weight: 700; color: #fff; }
+.vsub  { font-family: var(--mono); font-size: .7rem; color: var(--muted2); margin-top: .1rem; }
+.vactions { display: flex; gap: .5rem; flex-wrap: wrap; }
+.abtn {
+  display: inline-flex; align-items: center; gap: .35rem;
+  padding: .4rem .85rem; border-radius: 8px; border: 1px solid var(--bord2);
+  background: var(--sur2); color: var(--muted2); font-family: var(--mono);
+  font-size: .7rem; font-weight: 600; cursor: pointer; transition: all .2s;
+}
+.abtn:hover { color: #fff; background: rgba(255,255,255,.09); }
+.abtn.ok { color: var(--green); border-color: rgba(16,185,129,.4); }
+
+/* MQ Status bar inside viewer */
+.mq-bar {
+  background: rgba(245,158,11,.05); border-bottom: 1px solid rgba(245,158,11,.1);
+  padding: .55rem 1.2rem; display: flex; align-items: center; gap: 1.2rem;
+  font-family: var(--mono); font-size: .67rem; color: var(--muted2);
+  overflow-x: auto;
+}
+.mstep { display: flex; align-items: center; gap: .35rem; white-space: nowrap; }
+.mstep .d { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.mstep.done .d  { background: var(--green); }
+.mstep.now  .d  { background: var(--amber); animation: blink 1s infinite; }
+.mstep.wait .d  { background: var(--muted); }
+.marr { color: var(--muted); }
+
+/* Code area */
+.code-wrap { position: relative; }
+.lnums {
+  position: absolute; left:0;top:0;bottom:0;width:42px;
+  background: rgba(0,0,0,.2); border-right: 1px solid var(--border);
+  padding: 1.4rem 0; display: flex; flex-direction: column; align-items: flex-end;
+  padding-right: 8px; font-family: var(--mono); font-size: .72rem; color: var(--muted);
+  line-height: 1.85; user-select: none; pointer-events: none; overflow: hidden;
+}
+.cblock {
+  padding: 1.4rem 1.4rem 1.4rem 58px; overflow-x: auto; font-family: var(--mono);
+  font-size: .77rem; line-height: 1.85; white-space: pre; color: #abb2bf;
+  user-select: text; cursor: text; min-height: 180px;
+}
+/* syntax */
+.kw{color:#c678dd} .fn{color:#61afef} .st{color:#98c379} .cm{color:#4b5263;font-style:italic}
+.nm{color:#d19a66} .cl{color:#e5c07b} .op{color:#56b6c2} .at{color:#d19a66}
+
+.vfooter {
+  background: rgba(255,255,255,.02); border-top: 1px solid var(--border);
+  padding: .6rem 1.2rem; display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: .4rem;
+}
+.vmeta { font-family: var(--mono); font-size: .65rem; color: var(--muted); display: flex; gap: 1rem; }
+.vhint { font-family: var(--mono); font-size: .65rem; color: var(--muted); }
+
+/* ═══════════════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════════════ */
+footer { border-top: 1px solid var(--border); padding: 2.5rem 0 3rem; text-align: center; position: relative; z-index: 1; }
+.fglow {
+  position: absolute; top: -1px; left: 50%; transform: translateX(-50%);
+  width: 180px; height: 1px;
+  background: linear-gradient(90deg,transparent,var(--amber),transparent);
+  box-shadow: 0 0 18px rgba(245,158,11,.4);
+}
+.fname { font-family: var(--sans); font-weight: 800; font-size: 1.05rem;
+  background: linear-gradient(135deg,#fff,var(--amber));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  margin-bottom: .25rem; }
+.frole { font-family: var(--mono); font-size: .67rem; color: var(--muted); margin-bottom: 1rem; }
+.flinks { display: flex; gap: .6rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem; }
+.flink {
+  display: inline-flex; align-items: center; gap: .4rem;
+  padding: .4rem .95rem; border-radius: 100px; text-decoration: none;
+  font-family: var(--mono); font-size: .7rem; border: 1px solid; transition: all .2s;
+}
+.flink.p { background: rgba(245,158,11,.07); border-color: rgba(245,158,11,.25); color: var(--amber); }
+.flink.p:hover { background: rgba(245,158,11,.14); box-shadow: 0 0 14px rgba(245,158,11,.2); }
+.flink.l { background: rgba(96,165,250,.07); border-color: rgba(96,165,250,.25); color: var(--blue); }
+.flink.l:hover { background: rgba(96,165,250,.14); box-shadow: 0 0 14px rgba(96,165,250,.2); }
+.fcopy { font-family: var(--mono); font-size: .63rem; color: #252a3a; letter-spacing: 1px; text-transform: uppercase; }
+
+@media(max-width:640px){
+  h1{font-size:2rem}
+  .stacks-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
+  .pconn{min-width:12px;max-width:32px}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="z1">
+  <div class="wrap">
+    <div class="logo-row">
+      <span class="logo-icon">🔭</span>
+      <h1>Stack Radar</h1>
+    </div>
+    <p class="tagline">PDF → PyMuPDF → RabbitMQ → WebSocket → Live Code</p>
+
+    <!-- Pipeline diagram -->
+    <div class="pipeline">
+      <div class="pnode">
+        <div class="pbox pdf" id="p-pdf">📄</div>
+        <div class="plabel">PDF<br>Upload</div>
+      </div>
+      <div class="pconn" id="pc1"></div>
+      <div class="pnode">
+        <div class="pbox prod" id="p-ext">⚙️</div>
+        <div class="plabel">Extração<br>PyMuPDF</div>
+      </div>
+      <div class="pconn" id="pc2"></div>
+      <div class="pnode">
+        <div class="pbox queue" id="p-mq">🐇</div>
+        <div class="plabel">RabbitMQ<br>Queue</div>
+        <div class="qdots" id="qdots">
+          <div class="qdot"></div><div class="qdot"></div><div class="qdot"></div>
+        </div>
+      </div>
+      <div class="pconn" id="pc3"></div>
+      <div class="pnode">
+        <div class="pbox cons" id="p-ws">⚡</div>
+        <div class="plabel">Consumer<br>→ WebSocket</div>
+      </div>
+      <div class="pconn" id="pc4"></div>
+      <div class="pnode">
+        <div class="pbox out" id="p-ui">💡</div>
+        <div class="plabel">Live<br>UI</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- UPLOAD -->
+<section class="upload-section z1">
+  <div class="wrap">
+    <!-- Server status -->
+    <div style="text-align:center;margin-bottom:1rem">
+      <div class="server-status" id="server-status">
+        <div class="status-dot" id="sdot"></div>
+        <span id="slabel">verificando servidor...</span>
+      </div>
+    </div>
+
+    <div class="upload-zone" id="uzone">
+      <div class="uicon">📋</div>
+      <div class="utitle">Arraste seu PDF aqui</div>
+      <div class="usub">Currículo do LinkedIn · Qualquer CV em PDF · Máx 10 MB</div>
+      <div class="urow">
+        <button class="ubtn" onclick="document.getElementById('file-input').click()">
+          📂 Selecionar PDF
+        </button>
+        <span class="or">ou</span>
+        <button class="dbtn" onclick="modoDemo()">⚡ Carregar demo</button>
+      </div>
+      <input type="file" id="file-input" accept=".pdf">
+    </div>
+  </div>
+</section>
+
+<!-- TERMINAL -->
+<div class="z1"><div class="wrap">
+  <div class="terminal" id="terminal">
+    <div class="term-head">
+      <div class="tdot r"></div><div class="tdot y"></div><div class="tdot g"></div>
+      <span class="tlabel">stack-radar · pipeline log</span>
+      <span class="tcount" id="tcount"></span>
+    </div>
+    <div class="term-body" id="tbody"></div>
+  </div>
+</div></div>
+
+<!-- QUEUE PROGRESS -->
+<div class="z1"><div class="wrap">
+  <div class="queue-badge" id="qbadge">
+    <span>🐇</span>
+    <span id="qtext">Processando fila...</span>
+    <div class="qb-bar"><div class="qb-fill" id="qfill"></div></div>
+    <span id="qfrac" style="font-size:.68rem;white-space:nowrap">0/0</span>
+  </div>
+</div></div>
+
+<!-- STACKS GRID -->
+<section class="z1" id="stacks-section">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 class="sec-title">Stacks Detectadas</h2>
+      <span class="sec-count" id="scount"></span>
+    </div>
+    <div class="filter-row" id="frow"></div>
+    <div class="stacks-grid" id="sgrid"></div>
+  </div>
+</section>
+
+<!-- CODE VIEWER -->
+<section class="z1" id="viewer">
+  <div class="wrap">
+    <div class="vcard">
+      <!-- Tab bar (stacks prontas como abas) -->
+      <div class="vtabs" id="vtabs"></div>
+      <!-- Header -->
+      <div class="vheader">
+        <div class="vleft">
+          <span class="vicon" id="vicon">⚡</span>
+          <div>
+            <div class="vname" id="vname">Stack</div>
+            <div class="vsub"  id="vsub">exemplo</div>
+          </div>
+        </div>
+        <div class="vactions">
+          <button class="abtn" id="bcopy" onclick="copiar()">📋 Copiar código</button>
+          <button class="abtn" onclick="fechar()">✕ Fechar</button>
+        </div>
+      </div>
+
+      <!-- RabbitMQ status -->
+      <div class="mq-bar">
+        <div class="mstep done" id="ms1"><div class="d"></div>PDF lido</div>
+        <span class="marr">→</span>
+        <div class="mstep done" id="ms2"><div class="d"></div>Stack detectada</div>
+        <span class="marr">→</span>
+        <div class="mstep done" id="ms3"><div class="d"></div>Publicada na fila</div>
+        <span class="marr">→</span>
+        <div class="mstep now"  id="ms4"><div class="d"></div>Consumer processou</div>
+        <span class="marr">→</span>
+        <div class="mstep done" id="ms5"><div class="d"></div>Entregue via WebSocket</div>
+      </div>
+
+      <!-- Code -->
+      <div class="code-wrap">
+        <div class="lnums" id="lnums"></div>
+        <div class="cblock" id="cblock"></div>
+      </div>
+
+      <div class="vfooter">
+        <div class="vmeta">
+          <span id="vcat">—</span>
+          <span id="vlines">0 linhas</span>
+          <span>UTF-8</span>
+        </div>
+        <div class="vhint">✏️ Selecionável · Ctrl+A seleciona tudo</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="fglow"></div>
+  <div class="wrap">
+    <div class="fname">Marcos Silva</div>
+    <div class="frole">// Full-Stack Developer · Python · C# · React · .NET</div>
+    <div class="flinks">
+      <a class="flink p" href="https://masilvaarcs.github.io/portfolio-hub" target="_blank" rel="noopener">🖥 Portfólio</a>
+      <a class="flink l" href="https://www.linkedin.com/in/marcosprogramador" target="_blank" rel="noopener">💼 LinkedIn</a>
+    </div>
+    <div class="fcopy">stack-radar · fastapi · pika · rabbitmq · websocket · 2025</div>
+  </div>
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════════════════════════════════
+const API  = window.location.hostname === 'localhost'
+             ? 'http://localhost:8000'
+             : window.location.origin;   // mesmo host em produção
+const WS   = API.replace('http','ws');
+
+// ═══════════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════════
+let stacksAll       = [];   // todas detectadas
+let stacksReady     = [];   // processadas pelo consumer
+let stackAtiva      = null; // stack aberta no viewer
+let sessionId       = null;
+let ws              = null;
+let processados     = 0;
+let totalStacks     = 0;
+let filtroAtivo     = 'Todos';
+let serverOnline    = false;
+
+// banco de exemplos (fallback offline)
+const DEMO_DB = {
+  python:{name:"Python",icon:"🐍",color:"#3b82f6",category:"Backend",description:"Linguagem versátil para backend e ciência de dados.",example_title:"API REST com Flask",example:`from flask import Flask, jsonify, request\n\napp = Flask(__name__)\ntarefas = []\n\n@app.route("/tarefas", methods=["GET"])\ndef listar():\n    return jsonify(tarefas)\n\n@app.route("/tarefas", methods=["POST"])\ndef criar():\n    dado = request.get_json()\n    t = {"id": len(tarefas)+1, "titulo": dado["titulo"], "feita": False}\n    tarefas.append(t)\n    return jsonify(t), 201\n\nif __name__ == "__main__":\n    app.run(debug=True)`},
+  react:{name:"React",icon:"⚛️",color:"#38bdf8",category:"Frontend",description:"Biblioteca para interfaces declarativas e reativas.",example_title:"Hook useFetch customizado",example:`import { useState, useEffect, useCallback } from "react";\n\nfunction useFetch(url) {\n  const [dados, setDados]     = useState(null);\n  const [loading, setLoading] = useState(true);\n  const [erro, setErro]       = useState(null);\n\n  const buscar = useCallback(async () => {\n    setLoading(true); setErro(null);\n    try {\n      const res = await fetch(url);\n      if (!res.ok) throw new Error("HTTP " + res.status);\n      setDados(await res.json());\n    } catch (e) { setErro(e.message); }\n    finally { setLoading(false); }\n  }, [url]);\n\n  useEffect(() => { buscar(); }, [buscar]);\n  return { dados, loading, erro, refetch: buscar };\n}`},
+  typescript:{name:"TypeScript",icon:"🔷",color:"#60a5fa",category:"Frontend",description:"Superset tipado do JavaScript.",example_title:"Repositório genérico tipado",example:`interface Entidade { id: number; }\n\nclass Repositorio<T extends Entidade> {\n  private itens = new Map<number, T>();\n\n  salvar(item: T): T { this.itens.set(item.id, item); return item; }\n  buscarPorId(id: number): T | undefined { return this.itens.get(id); }\n  listarTodos(): T[] { return [...this.itens.values()]; }\n  filtrar(pred: (i:T) => boolean): T[] { return this.listarTodos().filter(pred); }\n}\n\ninterface Usuario extends Entidade { nome: string; ativo: boolean; }\n\nconst repo = new Repositorio<Usuario>();\nrepo.salvar({ id:1, nome:"Marcos", ativo:true });\nconst ativos = repo.filtrar(u => u.ativo);\nconsole.log(ativos); // [{id:1,nome:"Marcos",ativo:true}]`},
+  docker:{name:"Docker",icon:"🐳",color:"#0ea5e9",category:"DevOps",description:"Containerização para ambientes reproduzíveis.",example_title:"Dockerfile + docker-compose",example:`FROM python:3.12-slim\nWORKDIR /app\nCOPY requirements.txt .\nRUN pip install --no-cache-dir -r requirements.txt\nCOPY . .\nEXPOSE 8000\nCMD ["uvicorn","main:app","--host","0.0.0.0","--port","8000"]\n\n# docker-compose.yml\nversion: "3.9"\nservices:\n  api:\n    build: .\n    ports: ["8000:8000"]\n    environment:\n      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/\n    depends_on: [rabbitmq]\n  rabbitmq:\n    image: rabbitmq:3-management\n    ports: ["5672:5672","15672:15672"]`},
+  rabbitmq:{name:"RabbitMQ",icon:"🐇",color:"#fb923c",category:"Messaging",description:"Message broker para comunicação assíncrona.",example_title:"Producer + Consumer com fanout",example:`import pika, json\n\ndef publicar(tipo, dados):\n    conn = pika.BlockingConnection(pika.URLParameters("amqp://localhost"))\n    ch = conn.channel()\n    ch.exchange_declare(exchange="eventos", exchange_type="fanout", durable=True)\n    ch.basic_publish(\n        exchange="eventos", routing_key="",\n        body=json.dumps({"tipo": tipo, "dados": dados}),\n        properties=pika.BasicProperties(delivery_mode=2)\n    )\n    conn.close()\n\ndef consumir(servico, handler):\n    conn = pika.BlockingConnection(pika.URLParameters("amqp://localhost"))\n    ch = conn.channel()\n    ch.exchange_declare(exchange="eventos", exchange_type="fanout", durable=True)\n    fila = ch.queue_declare("", exclusive=True).method.queue\n    ch.queue_bind(exchange="eventos", queue=fila)\n    ch.basic_qos(prefetch_count=1)\n    def cb(ch,m,_,b): handler(json.loads(b)); ch.basic_ack(m.delivery_tag)\n    ch.basic_consume(fila, cb)\n    ch.start_consuming()`},
+  angular:{name:"Angular",icon:"🔺",color:"#f97316",category:"Frontend",description:"Framework completo com DI e RxJS.",example_title:"Service reativo com BehaviorSubject",example:`import { Injectable } from "@angular/core";\nimport { HttpClient } from "@angular/common/http";\nimport { BehaviorSubject, catchError, of } from "rxjs";\n\nexport interface Produto { id: number; nome: string; preco: number; }\n\n@Injectable({ providedIn: "root" })\nexport class ProdutoService {\n  private _produtos$ = new BehaviorSubject<Produto[]>([]);\n  readonly produtos$ = this._produtos$.asObservable();\n\n  constructor(private http: HttpClient) {}\n\n  carregar() {\n    this.http.get<Produto[]>("/api/produtos").pipe(\n      catchError(() => of([]))\n    ).subscribe(l => this._produtos$.next(l));\n  }\n}`},
+  csharp:{name:"C#",icon:"💜",color:"#c084fc",category:"Backend",description:"Linguagem OO da Microsoft para .NET.",example_title:"Repository Pattern + Controller",example:`public interface IRepository<T> where T : class\n{\n    Task<IEnumerable<T>> GetAllAsync();\n    Task<T>  CreateAsync(T entity);\n    Task     DeleteAsync(int id);\n}\n\npublic class PedidoRepository(AppDbContext ctx) : IRepository<Pedido>\n{\n    public async Task<IEnumerable<Pedido>> GetAllAsync() =>\n        await ctx.Pedidos.Include(p => p.Cliente).ToListAsync();\n\n    public async Task<Pedido> CreateAsync(Pedido p)\n    {\n        ctx.Pedidos.Add(p);\n        await ctx.SaveChangesAsync();\n        return p;\n    }\n}`},
+  dotnet:{name:".NET",icon:"🟣",color:"#a855f7",category:"Backend",description:"Plataforma Microsoft para aplicações modernas.",example_title:"Worker Service com RabbitMQ",example:`public sealed class PedidoWorker(ILogger<PedidoWorker> logger) : BackgroundService\n{\n    private IModel? _ch;\n\n    public override Task StartAsync(CancellationToken ct)\n    {\n        var factory = new ConnectionFactory { HostName = "localhost" };\n        var conn = factory.CreateConnection();\n        _ch = conn.CreateModel();\n        _ch.QueueDeclare("pedidos", durable:true, exclusive:false, autoDelete:false);\n        _ch.BasicQos(0, 1, false);\n        return base.StartAsync(ct);\n    }\n\n    protected override Task ExecuteAsync(CancellationToken ct)\n    {\n        var c = new EventingBasicConsumer(_ch);\n        c.Received += (_, ea) => {\n            var json = Encoding.UTF8.GetString(ea.Body.ToArray());\n            logger.LogInformation("Processando: {json}", json);\n            _ch!.BasicAck(ea.DeliveryTag, false);\n        };\n        _ch!.BasicConsume("pedidos", false, c);\n        return Task.CompletedTask;\n    }\n}`},
+  postgresql:{name:"PostgreSQL",icon:"🐘",color:"#818cf8",category:"Database",description:"Banco relacional com window functions e JSON.",example_title:"Window Functions + CTE",example:`-- Ranking de vendas por mês\nWITH vendas AS (\n    SELECT vendedor_id,\n           DATE_TRUNC('month', data_venda) AS mes,\n           SUM(valor_total)               AS total\n    FROM pedidos WHERE status = 'concluido'\n    GROUP BY vendedor_id, DATE_TRUNC('month', data_venda)\n)\nSELECT\n    v.nome,\n    TO_CHAR(vm.mes,'MM/YYYY')  AS mes,\n    vm.total,\n    RANK() OVER (PARTITION BY vm.mes ORDER BY vm.total DESC) AS pos,\n    LAG(vm.total) OVER (PARTITION BY vm.vendedor_id ORDER BY vm.mes) AS anterior\nFROM vendas vm\nJOIN vendedores v ON v.id = vm.vendedor_id\nORDER BY mes DESC, pos;`},
+  redis:{name:"Redis",icon:"🔴",color:"#f87171",category:"Cache",description:"Store in-memory para cache, sessão e pub/sub.",example_title:"Cache decorator async",example:`import redis.asyncio as aioredis\nimport json, functools\nfrom datetime import timedelta\n\nr = aioredis.from_url("redis://localhost:6379", decode_responses=True)\n\ndef cache(ttl=60):\n    def dec(fn):\n        @functools.wraps(fn)\n        async def wrapper(*a, **kw):\n            chave = f"{fn.__name__}:{a}:{sorted(kw.items())}"\n            cached = await r.get(chave)\n            if cached: return json.loads(cached)\n            res = await fn(*a, **kw)\n            await r.setex(chave, timedelta(seconds=ttl), json.dumps(res))\n            return res\n        return wrapper\n    return dec\n\n@cache(ttl=300)\nasync def buscar_produto(pid: int):\n    return {"id": pid, "nome": "Produto X"}`},
+  sql:{name:"SQL",icon:"🗄️",color:"#a78bfa",category:"Database",description:"Linguagem padrão para bancos relacionais.",example_title:"Segmentação de clientes",example:`SELECT\n    c.nome, c.email,\n    COUNT(p.id)        AS pedidos,\n    SUM(p.valor_total) AS receita,\n    AVG(p.valor_total) AS ticket,\n    CASE\n        WHEN COUNT(p.id) >= 10 THEN 'VIP'\n        WHEN COUNT(p.id) >=  5 THEN 'Fiel'\n        ELSE 'Novo'\n    END AS segmento\nFROM clientes c\nLEFT JOIN pedidos p\n    ON p.cliente_id = c.id\n   AND p.status != 'cancelado'\nWHERE c.ativo = 1\nGROUP BY c.id, c.nome, c.email\nHAVING COUNT(p.id) > 0\nORDER BY receita DESC;`},
+  node:{name:"Node.js",icon:"🟢",color:"#4ade80",category:"Backend",description:"Runtime JavaScript server-side.",example_title:"Express + Zod validation",example:`import express from "express";\nimport { z } from "zod";\n\nconst app = express();\napp.use(express.json());\n\nconst Schema = z.object({\n  nome:    z.string().min(2),\n  preco:   z.number().positive(),\n  estoque: z.number().int().nonneg(),\n});\n\nconst validar = s => (req,res,next) => {\n  const r = s.safeParse(req.body);\n  if (!r.success) return res.status(400).json(r.error.flatten());\n  req.body = r.data; next();\n};\n\nconst db = new Map(); let id = 1;\n\napp.get("/items", (_, res) => res.json([...db.values()]));\napp.post("/items", validar(Schema), (req,res) => {\n  const item = { id: id++, ...req.body };\n  db.set(item.id, item);\n  res.status(201).json(item);\n});\n\napp.listen(3000);`},
+  javascript:{name:"JavaScript",icon:"🟡",color:"#fbbf24",category:"Frontend",description:"Linguagem universal da web.",example_title:"EventBus + Promise.all",example:`class EventBus {\n  #h = new Map();\n  on(ev, fn)  { if(!this.#h.has(ev)) this.#h.set(ev,[]); this.#h.get(ev).push(fn); return ()=>this.off(ev,fn); }\n  off(ev, fn) { this.#h.set(ev,(this.#h.get(ev)??[]).filter(f=>f!==fn)); }\n  emit(ev, d) { (this.#h.get(ev)??[]).forEach(f=>f(d)); }\n}\n\nasync function dashboard(uid) {\n  const [user, orders, notifs] = await Promise.all([\n    fetch(\`/api/users/\${uid}\`).then(r=>r.json()),\n    fetch(\`/api/orders?uid=\${uid}\`).then(r=>r.json()),\n    fetch(\`/api/notifs/\${uid}\`).then(r=>r.json()),\n  ]);\n  return {user, orders, notifs};\n}\n\nconst bus = new EventBus();\nconst off = bus.on("order:created", e => console.log("Novo pedido:", e.id));\nbus.emit("order:created", {id:42, valor:149.90});\noff();`},
+  fastapi:{name:"FastAPI",icon:"⚡",color:"#06b6d4",category:"Backend",description:"Framework moderno para APIs assíncronas.",example_title:"CRUD com Pydantic + tipagem",example:`from fastapi import FastAPI, HTTPException\nfrom pydantic import BaseModel\nfrom typing import Optional\n\napp = FastAPI()\n\nclass Item(BaseModel):\n    nome:      str\n    preco:     float\n    disponivel: bool = True\n    desc:      Optional[str] = None\n\ndb: dict[int, Item] = {}\n_id = 0\n\n@app.post("/items/", status_code=201)\nasync def criar(item: Item) -> Item:\n    global _id; _id += 1\n    db[_id] = item; return item\n\n@app.get("/items/{iid}")\nasync def buscar(iid: int) -> Item:\n    if iid not in db: raise HTTPException(404, "Not found")\n    return db[iid]\n\n@app.delete("/items/{iid}")\nasync def deletar(iid: int):\n    db.pop(iid, None); return {"ok": True}`},
+  flask:{name:"Flask",icon:"🌶️",color:"#ef4444",category:"Backend",description:"Microframework web leve para Python.",example_title:"Blueprint + JWT middleware",example:`from flask import Flask, Blueprint, request, jsonify\nfrom functools import wraps\nimport jwt, datetime\n\nauth = Blueprint("auth", __name__, url_prefix="/auth")\nSECRET = "chave"\n\ndef require_token(f):\n    @wraps(f)\n    def inner(*a, **kw):\n        tok = request.headers.get("Authorization","").removeprefix("Bearer ")\n        if not tok: return jsonify({"err":"sem token"}), 401\n        try: payload = jwt.decode(tok, SECRET, algorithms=["HS256"])\n        except: return jsonify({"err":"token inválido"}), 401\n        return f(payload, *a, **kw)\n    return inner\n\n@auth.route("/login", methods=["POST"])\ndef login():\n    b = request.get_json()\n    if b.get("senha") == "1234":\n        tok = jwt.encode({"u":b["user"],"exp":datetime.datetime.utcnow()+datetime.timedelta(hours=1)},SECRET)\n        return jsonify({"token":tok})\n    return jsonify({"err":"inválido"}),401`},
+  pandas:{name:"Pandas",icon:"🐼",color:"#34d399",category:"Data Science",description:"Análise e manipulação de dados tabulares.",example_title:"EDA + Pivot Table",example:`import pandas as pd\n\ndf = pd.read_csv("vendas.csv", parse_dates=["data_venda"])\n\n# Limpeza\ndf = df.dropna(subset=["valor_total","produto_id"])\ndf["valor_total"] = pd.to_numeric(df["valor_total"], errors="coerce")\ndf["mes"]        = df["data_venda"].dt.to_period("M")\n\n# Receita por mês\nreceita = (\n    df.groupby("mes")["valor_total"]\n      .agg(receita="sum", pedidos="count", ticket="mean")\n      .round(2)\n)\n\n# Top 10\ntop = (\n    df.groupby("produto")["valor_total"]\n      .agg(["count","sum"])\n      .sort_values("sum", ascending=False)\n      .head(10)\n)\n\n# Pivot\npivot = pd.pivot_table(df, values="valor_total",\n                       index="categoria", columns="mes",\n                       aggfunc="sum", fill_value=0)\nprint(pivot)`},
+  django:{name:"Django",icon:"🎸",color:"#22c55e",category:"Backend",description:"Framework full-stack com ORM, admin e auth.",example_title:"Model + View com ORM",example:`# models.py\nfrom django.db import models\n\nclass Produto(models.Model):\n    class Cat(models.TextChoices):\n        ELET="EL","Eletrônico"\n        VEST="VE","Vestuário"\n\n    nome      = models.CharField(max_length=200)\n    preco     = models.DecimalField(max_digits=10, decimal_places=2)\n    estoque   = models.IntegerField(default=0)\n    categoria = models.CharField(max_length=2, choices=Cat.choices)\n    criado    = models.DateTimeField(auto_now_add=True)\n\n    @property\n    def disponivel(self): return self.estoque > 0\n\n# views.py\nfrom django.http import JsonResponse\nfrom django.views import View\nfrom .models import Produto\n\nclass ProdutoView(View):\n    def get(self, req, pk=None):\n        if pk:\n            try: p = Produto.objects.get(pk=pk)\n            except Produto.DoesNotExist: return JsonResponse({"e":"404"},status=404)\n            return JsonResponse({"nome":p.nome,"preco":str(p.preco)})\n        return JsonResponse({"items":list(Produto.objects.values())})`,}
+};
+
+// ═══════════════════════════════════════════════════════════════
+//  SERVER CHECK
+// ═══════════════════════════════════════════════════════════════
+async function checkServer() {
+  try {
+    const r = await fetch(`${API}/health`, { signal: AbortSignal.timeout(3000) });
+    serverOnline = r.ok;
+  } catch { serverOnline = false; }
+
+  const dot = document.getElementById('sdot');
+  const lbl = document.getElementById('slabel');
+  if (serverOnline) {
+    dot.classList.add('online'); dot.classList.remove('offline');
+    lbl.textContent = 'backend online — RabbitMQ real';
+  } else {
+    dot.classList.add('offline'); dot.classList.remove('online');
+    lbl.textContent = 'modo offline — demo simulado';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  LOG
+// ═══════════════════════════════════════════════════════════════
+let logCount = 0;
+function log(msg, tipo='d') {
+  const term = document.getElementById('terminal');
+  const body = document.getElementById('tbody');
+  term.style.display = 'block';
+  logCount++;
+  document.getElementById('tcount').textContent = `${logCount} linhas`;
+  const ts   = new Date().toLocaleTimeString('pt-BR');
+  const line = Object.assign(document.createElement('div'), {
+    className: `ll l${tipo}`,
+    textContent: `[${ts}]  ${msg}`
+  });
+  body.appendChild(line);
+  body.scrollTop = body.scrollHeight;
+}
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+// ═══════════════════════════════════════════════════════════════
+//  UPLOAD HANDLER
+// ═══════════════════════════════════════════════════════════════
+document.getElementById('file-input').addEventListener('change', async e => {
+  const f = e.target.files[0];
+  if (f) await processarPDF(f);
+});
+const uzone = document.getElementById('uzone');
+uzone.addEventListener('dragover', e => { e.preventDefault(); uzone.classList.add('drag-over'); });
+uzone.addEventListener('dragleave', () => uzone.classList.remove('drag-over'));
+uzone.addEventListener('drop', async e => {
+  e.preventDefault(); uzone.classList.remove('drag-over');
+  const f = e.dataTransfer.files[0];
+  if (f?.name.endsWith('.pdf')) await processarPDF(f);
+  else log('❌ Só arquivos .pdf são aceitos', 'e');
+});
+
+async function processarPDF(file) {
+  resetUI();
+  log(`📋 Arquivo: ${file.name} (${(file.size/1024).toFixed(1)} KB)`, 'i');
+
+  if (serverOnline) {
+    await pipelineReal(file);
+  } else {
+    log('⚠️  Servidor offline — usando modo demo simulado', 'w');
+    await sleep(400);
+    await pipelineDemo(true, file);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  PIPELINE REAL (com backend + RabbitMQ)
+// ═══════════════════════════════════════════════════════════════
+async function pipelineReal(file) {
+  activarNode('p-pdf', 'pc1');
+  log('📄 Enviando PDF ao backend (FastAPI)...', 'i');
+
+  // 1. Upload
+  const fd = new FormData();
+  fd.append('pdf', file);
+  let uploadRes;
+  try {
+    const r = await fetch(`${API}/upload`, { method: 'POST', body: fd });
+    if (!r.ok) {
+      const err = await r.json();
+      log(`❌ ${err.detail || 'Erro no upload'}`, 'e');
+      return;
+    }
+    uploadRes = await r.json();
+  } catch (e) {
+    log(`❌ Falha na conexão: ${e.message}`, 'e');
+    return;
+  }
+
+  const { session_id, encontradas, stacks: stacksInfo } = uploadRes;
+  sessionId   = session_id;
+  totalStacks = encontradas;
+
+  activarNode('p-ext', 'pc2');
+  log(`🔍 PyMuPDF extraiu texto — ${encontradas} stack(s) detectada(s)`, 'k');
+  log(`📦 Stacks: ${stacksInfo.map(s => s.name).join(', ')}`, 'd');
+
+  // Inicializa cards como "pendentes"
+  stacksAll = stacksInfo.map(s => ({ id: s.id, name: s.name, icon: s.icon, ...(DEMO_DB[s.id]||{}) }));
+  renderGrid(stacksAll);
+
+  // 2. Conecta WebSocket ANTES de disparar o pipeline
+  await conectarWS(session_id);
+
+  // 3. Dispara pipeline RabbitMQ
+  activarNode('p-mq', 'pc3');
+  log('🐇 Publicando stacks na fila RabbitMQ...', 'i');
+
+  try {
+    const r = await fetch(`${API}/processar/${session_id}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ stacks: stacksAll }),
+    });
+    if (!r.ok) { log('❌ Erro ao iniciar pipeline', 'e'); return; }
+    const res = await r.json();
+    log(`📤 ${res.total} mensagens publicadas na fila "${res.session_id.slice(0,8)}..."`, 'k');
+  } catch (e) {
+    log(`❌ ${e.message}`, 'e');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  WEBSOCKET
+// ═══════════════════════════════════════════════════════════════
+function conectarWS(sid) {
+  return new Promise(resolve => {
+    ws = new WebSocket(`${WS}/ws/${sid}`);
+
+    ws.onopen = () => {
+      log(`⚡ WebSocket conectado — aguardando consumer...`, 'k');
+      activarNode('p-ws', 'pc4');
+      mostrarQueueBadge();
+      resolve();
+    };
+
+    ws.onmessage = async (e) => {
+      const msg = JSON.parse(e.data);
+
+      if (msg.type === 'stack_processed') {
+        processados++;
+        const pct = Math.round((processados / msg.total) * 100);
+        atualizarQueueBadge(processados, msg.total, pct);
+
+        log(`✅ Consumer: ${msg.icon} ${msg.name} processada (${processados}/${msg.total})`, 'k');
+
+        // Busca dados completos da stack
+        let stackData = DEMO_DB[msg.stack_id] || { ...msg };
+        if (serverOnline) {
+          try {
+            const r = await fetch(`${API}/stack/${msg.stack_id}`);
+            if (r.ok) stackData = await r.json();
+          } catch {}
+        }
+
+        stacksReady.push(stackData);
+        marcarCardPronto(msg.stack_id, stackData);
+        atualizarTabs();
+
+        if (stacksReady.length === 1) {
+          // Abre automaticamente o viewer na 1ª stack
+          mostrarViewer(msg.stack_id);
+        }
+      }
+
+      if (msg.type === 'done') {
+        activarNode('p-ui');
+        log(`🎉 Pipeline concluído! ${msg.total} stacks processadas via RabbitMQ`, 'k');
+        document.getElementById('qbadge').style.display = 'none';
+        ws.close();
+      }
+
+      if (msg.type === 'error') {
+        log(`❌ Erro no consumer: ${msg.message}`, 'e');
+      }
+    };
+
+    ws.onerror = () => log('❌ WebSocket: erro de conexão', 'e');
+    ws.onclose = () => log('🔌 WebSocket desconectado', 'd');
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  PIPELINE DEMO (sem backend)
+// ═══════════════════════════════════════════════════════════════
+async function pipelineDemo(comPDF = false, file = null) {
+  const DEMO_IDS = ['python','react','typescript','angular','javascript','node',
+                    'docker','rabbitmq','postgresql','sql','csharp','dotnet',
+                    'redis','fastapi','flask','pandas','django'];
+
+  // Simula detecção em PDF real (extrai texto básico no browser)
+  let detectedIds = DEMO_IDS;
+  if (comPDF && file) {
+    try {
+      const text = await lerPDFBasico(file);
+      const kws = {python:['python'],react:['react'],typescript:['typescript'],angular:['angular'],javascript:['javascript','node'],node:['node.js','nodejs'],docker:['docker'],rabbitmq:['rabbitmq','amqp'],postgresql:['postgresql','postgres'],sql:[' sql ','mysql','sqlite'],csharp:['c#'],dotnet:['.net','asp.net'],redis:['redis'],fastapi:['fastapi'],flask:['flask'],pandas:['pandas','numpy'],django:['django']};
+      const found = [];
+      const tl = text.toLowerCase();
+      for (const [id, kw] of Object.entries(kws)) {
+        if (kw.some(k => tl.includes(k))) found.push(id);
+      }
+      if (found.length > 0) detectedIds = found;
+    } catch {}
+  }
+
+  stacksAll   = detectedIds.map(id => ({ id, ...DEMO_DB[id] })).filter(s=>s.name);
+  totalStacks = stacksAll.length;
+  processados = 0;
+
+  resetUI();
+  activarNode('p-pdf', 'pc1');
+  if (comPDF && file) log(`📋 PDF: ${file.name}`, 'i');
+  await sleep(400);
+
+  activarNode('p-ext', 'pc2');
+  log(`🔍 Texto extraído — ${totalStacks} stack(s) detectada(s)`, 'k');
+  log(`📦 ${stacksAll.map(s=>s.name).join(', ')}`, 'd');
+  await sleep(500);
+
+  renderGrid(stacksAll);
+
+  activarNode('p-mq', 'pc3');
+  log('🐇 Publicando na fila RabbitMQ (demo simulado)...', 'w');
+  await sleep(400);
+  log(`📤 ${totalStacks} mensagens publicadas — fila: stack_radar`, 'k');
+  await sleep(300);
+
+  activarNode('p-ws', 'pc4');
+  log('⚡ Consumer iniciado — prefetch_count=1, ACK manual', 'i');
+  mostrarQueueBadge();
+
+  // Simula consumer processando uma por vez
+  for (let i = 0; i < stacksAll.length; i++) {
+    await sleep(420 + Math.random() * 180);
+    processados++;
+    const s   = stacksAll[i];
+    const pct = Math.round((processados / totalStacks) * 100);
+
+    atualizarQueueBadge(processados, totalStacks, pct);
+    log(`✅ Consumer: ${s.icon} ${s.name} processada e ACK enviado (${processados}/${totalStacks})`, 'k');
+
+    stacksReady.push(s);
+    marcarCardPronto(s.id, s);
+    atualizarTabs();
+
+    if (stacksReady.length === 1) mostrarViewer(s.id);
+  }
+
+  await sleep(300);
+  activarNode('p-ui');
+  log('🎉 Pipeline concluído! Clique nas stacks para ver os exemplos.', 'k');
+  document.getElementById('qbadge').style.display = 'none';
+}
+
+// Lê texto básico de PDF no browser
+async function lerPDFBasico(file) {
+  return new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const bytes = new Uint8Array(e.target.result);
+      const dec   = new TextDecoder('latin1');
+      const raw   = dec.decode(bytes);
+      let text = '';
+      const re = /\(([^)]{2,80})\)/g;
+      let m;
+      while ((m = re.exec(raw)) !== null) text += m[1] + ' ';
+      resolve(text);
+    };
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+async function modoDemo() {
+  resetUI();
+  log('⚡ Modo DEMO — simulando currículo Full-Stack Sênior', 'w');
+  await pipelineDemo(false);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  UI HELPERS
+// ═══════════════════════════════════════════════════════════════
+function resetUI() {
+  stacksAll=[]; stacksReady=[]; stackAtiva=null; processados=0; logCount=0;
+  document.getElementById('stacks-section').style.display='none';
+  document.getElementById('viewer').style.display='none';
+  document.getElementById('qbadge').style.display='none';
+  document.getElementById('terminal').style.display='none';
+  document.getElementById('tbody').innerHTML='';
+  document.getElementById('sgrid').innerHTML='';
+  document.getElementById('vtabs').innerHTML='';
+  document.getElementById('tcount').textContent='';
+  filtroAtivo='Todos';
+  // reset pipeline nodes
+  ['p-pdf','p-ext','p-mq','p-ws','p-ui'].forEach(id=>document.getElementById(id)?.classList.remove('active'));
+  ['pc1','pc2','pc3','pc4'].forEach(id=>{const el=document.getElementById(id);if(el)el.className='pconn';});
+}
+
+function activarNode(nodeId, connId) {
+  document.getElementById(nodeId)?.classList.add('active');
+  if (connId) {
+    const el = document.getElementById(connId);
+    if (el) { el.className='pconn active'; }
+  }
+}
+
+function mostrarQueueBadge() {
+  const b = document.getElementById('qbadge');
+  b.style.display='inline-flex';
+  atualizarQueueBadge(0, totalStacks, 0);
+}
+function atualizarQueueBadge(proc, total, pct) {
+  document.getElementById('qtext').textContent  = `Consumer processando...`;
+  document.getElementById('qfrac').textContent  = `${proc}/${total}`;
+  document.getElementById('qfill').style.width  = `${pct}%`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  GRID
+// ═══════════════════════════════════════════════════════════════
+function renderGrid(stacks, filtro='Todos') {
+  filtroAtivo = filtro;
+  const sec  = document.getElementById('stacks-section');
+  const grid = document.getElementById('sgrid');
+  sec.style.display='block';
+
+  const cats = ['Todos', ...new Set(stacks.map(s=>s.category).filter(Boolean))];
+  document.getElementById('frow').innerHTML = cats.map(c=>
+    `<button class="fbtn ${c===filtro?'on':''}" onclick="renderGrid(stacksAll,'${c}')">${c}</button>`
+  ).join('');
+
+  const filtradas = filtro==='Todos' ? stacks : stacks.filter(s=>s.category===filtro);
+  document.getElementById('scount').textContent = `${filtradas.length} de ${stacks.length} stacks`;
+
+  grid.innerHTML = filtradas.map((s,i) => {
+    const pronta = stacksReady.some(r=>r.id===s.id);
+    const proc   = !pronta && processados < totalStacks;
+    const sel    = stackAtiva===s.id;
+    return `
+      <div class="scard ${pronta?'ready':''} ${sel?'selected':''}"
+           style="--sc:${s.color||'var(--amber)'}; animation-delay:${i*50}ms"
+           id="card-${s.id}" onclick="selecionarStack('${s.id}')">
+        <div class="spin-ring"><div class="spin"></div></div>
+        <div class="cdot"></div>
+        <div class="cicon">${s.icon||'📦'}</div>
+        <div class="cname">${s.name}</div>
+        <div class="ccat">${s.category||''}</div>
+      </div>`;
+  }).join('');
+}
+
+function marcarCardPronto(stackId, data) {
+  const card = document.getElementById(`card-${stackId}`);
+  if (card) {
+    card.classList.remove('processing');
+    card.classList.add('ready');
+    card.style.setProperty('--sc', data.color||'var(--amber)');
+  }
+  renderGrid(stacksAll, filtroAtivo);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  TABS NO VIEWER
+// ═══════════════════════════════════════════════════════════════
+function atualizarTabs() {
+  const tabs = document.getElementById('vtabs');
+  tabs.innerHTML = stacksReady.map(s=>
+    `<div class="vtab ${stackAtiva===s.id?'active':''}"
+          onclick="mostrarViewer('${s.id}')">${s.icon} ${s.name}</div>`
+  ).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  VIEWER
+// ═══════════════════════════════════════════════════════════════
+function selecionarStack(id) {
+  const s = stacksReady.find(s=>s.id===id);
+  if (!s) return; // ainda não processada
+  mostrarViewer(id);
+}
+
+function mostrarViewer(id) {
+  const stack = stacksReady.find(s=>s.id===id);
+  if (!stack) return;
+
+  stackAtiva = id;
+  atualizarTabs();
+  renderGrid(stacksAll, filtroAtivo);
+
+  const v = document.getElementById('viewer');
+  v.style.display='block';
+  v.scrollIntoView({ behavior:'smooth', block:'start' });
+
+  document.getElementById('vicon').textContent  = stack.icon||'📦';
+  document.getElementById('vname').textContent  = stack.name;
+  document.getElementById('vsub').textContent   = stack.example_title||stack.title||'Exemplo';
+  document.getElementById('vcat').textContent   = stack.category||'';
+
+  const code  = stack.example||stack.code||'// sem exemplo';
+  const lines = code.split('\n');
+  document.getElementById('vlines').textContent = `${lines.length} linhas`;
+  document.getElementById('lnums').innerHTML    = lines.map((_,i)=>`<span>${i+1}</span>`).join('');
+  document.getElementById('cblock').innerHTML   = highlight(code);
+
+  // Animação do MQ status bar
+  animarMQ();
+}
+
+function fechar() {
+  document.getElementById('viewer').style.display='none';
+  stackAtiva = null;
+  atualizarTabs();
+  renderGrid(stacksAll, filtroAtivo);
+}
+
+async function copiar() {
+  const s = stacksReady.find(s=>s.id===stackAtiva);
+  if (!s) return;
+  const code = s.example||s.code||'';
+  try { await navigator.clipboard.writeText(code); }
+  catch {
+    const ta = Object.assign(document.createElement('textarea'),{value:code,style:'position:fixed;opacity:0'});
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+  }
+  const btn = document.getElementById('bcopy');
+  btn.textContent='✅ Copiado!'; btn.classList.add('ok');
+  setTimeout(()=>{ btn.textContent='📋 Copiar código'; btn.classList.remove('ok'); }, 2000);
+}
+
+async function animarMQ() {
+  const steps = ['ms1','ms2','ms3','ms4','ms5'];
+  steps.forEach(id => document.getElementById(id).className='mstep wait');
+  for (let i=0;i<steps.length;i++) {
+    await sleep(280);
+    document.getElementById(steps[i]).className = i<steps.length-1 ? 'mstep now' : 'mstep done';
+    if (i>0) document.getElementById(steps[i-1]).className='mstep done';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  SYNTAX HIGHLIGHT
+// ═══════════════════════════════════════════════════════════════
+function highlight(code) {
+  let h = code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  h = h.replace(/(["'`])((?:\\.|(?!\1)[^\\])*)\1/g,'<span class="st">$1$2$1</span>');
+  h = h.replace(/(#[^\n]*)/g,'<span class="cm">$1</span>');
+  h = h.replace(/(\/\/[^\n]*)/g,'<span class="cm">$1</span>');
+  const kws=['import','from','def','class','return','if','else','elif','for','while','in',
+    'not','and','or','True','False','None','async','await','try','except','with','as',
+    'lambda','yield','raise','pass','break','continue','const','let','var','function',
+    'export','default','new','this','typeof','interface','type','extends','implements',
+    'private','public','protected','static','readonly','using','void','int','string',
+    'bool','float','double','object','Task','List','Dict','Optional','true','false',
+    'null','undefined','super','override','sealed'];
+  h = h.replace(new RegExp(`\\b(${kws.join('|')})\\b`,'g'),'<span class="kw">$1</span>');
+  h = h.replace(/(@\w+)/g,'<span class="at">$1</span>');
+  h = h.replace(/\b(\d+\.?\d*)\b/g,'<span class="nm">$1</span>');
+  h = h.replace(/\b([a-zA-Z_]\w*)\s*(?=\()/g,'<span class="fn">$1</span>');
+  h = h.replace(/\b([A-Z][a-zA-Z0-9_]+)\b/g,'<span class="cl">$1</span>');
+  return h;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════════
+checkServer();
+</script>
+</body>
+</html>
