@@ -2636,7 +2636,9 @@
           "perfil",
           "sobre mim",
           "resumo profissional",
-          "perfil profissional"
+          "perfil profissional",
+          "about",
+          "headline"
         ]
       },
       "experience": {
@@ -2645,7 +2647,8 @@
           "experiência",
           "experience",
           "experiência profissional",
-          "histórico profissional"
+          "histórico profissional",
+          "work experience"
         ]
       },
       "education": {
@@ -2655,7 +2658,8 @@
           "education",
           "educação",
           "formação acadêmica",
-          "escolaridade"
+          "escolaridade",
+          "academic background"
         ]
       },
       "skills": {
@@ -2667,7 +2671,10 @@
           "stack técnica",
           "tecnologias",
           "conhecimentos",
-          "ferramentas"
+          "ferramentas",
+          "top skills",
+          "technical skills",
+          "core competencies"
         ]
       },
       "certifications": {
@@ -2676,7 +2683,10 @@
           "certificações",
           "certificados",
           "certifications",
-          "cursos"
+          "cursos",
+          "licenses & certifications",
+          "honors & awards",
+          "licenses"
         ]
       },
       "languages": {
@@ -2684,7 +2694,8 @@
         "names": [
           "idiomas",
           "languages",
-          "línguas"
+          "línguas",
+          "language proficiency"
         ]
       },
       "projects": {
@@ -2693,7 +2704,10 @@
           "projetos",
           "projects",
           "portfólio",
-          "portfolio"
+          "portfolio",
+          "publications",
+          "publicações",
+          "volunteer experience"
         ]
       }
     },
@@ -2761,7 +2775,33 @@
       "elaborei",
       "prototipei",
       "utilizei",
-      "atuei"
+      "atuei",
+      "developed",
+      "implemented",
+      "led",
+      "managed",
+      "optimized",
+      "created",
+      "designed",
+      "automated",
+      "integrated",
+      "built",
+      "delivered",
+      "reduced",
+      "increased",
+      "migrated",
+      "deployed",
+      "maintained",
+      "modernized",
+      "trained",
+      "collaborated",
+      "analyzed",
+      "configured",
+      "solved",
+      "architected",
+      "refactored",
+      "orchestrated",
+      "spearheaded"
     ],
     "quantifiers_patterns": [
       "\\d+%",

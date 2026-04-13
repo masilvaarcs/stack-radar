@@ -2,9 +2,11 @@
 
 # 🔭 Stack Radar
 
-**Analisa currículos em PDF e detecta stacks tecnológicas em tempo real**
+**Analisa currículos em PDF e detecta competências profissionais em tempo real**
 
 `PDF` → `PyMuPDF` → `RabbitMQ` → `WebSocket` → `Live UI`
+
+> Compatível com PDFs do LinkedIn, Word, Canva e qualquer plataforma — mapeia seções em PT-BR e EN.
 
 [![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white)](https://python.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
@@ -35,9 +37,13 @@
 
 ## 💡 O que é?
 
-Upload de currículo em PDF → extração de texto → detecção automática de stacks → processamento via **message broker real** → exibição de exemplos de código e curiosidades ao vivo no browser.
+Upload de currículo em PDF → extração de texto → detecção automática de **228 competências em 8 áreas profissionais** → processamento via **message broker real** → exibição de exemplos de código e curiosidades ao vivo no browser.
 
 Cada stack detectada vira uma **mensagem AMQP** que é publicada, enfileirada, consumida e entregue via WebSocket — tudo visível em tempo real. Ao clicar em qualquer stack, um **code viewer** moderno exibe um exemplo de código real e uma **curiosidade** sobre a tecnologia.
+
+Além da detecção de competências, o sistema inclui um **analisador ATS** que pontua o currículo em 6 dimensões (seções, verbos de ação, métricas, contato, extensão, competências) com score de 0 a 100 e sugestões de melhoria.
+
+> **LinkedIn PDF vs CV otimizado:** O sistema reconhece tanto seções em PT-BR ("Experiência Profissional", "Stack Técnica") quanto seções em inglês do LinkedIn PDF ("Top Skills", "About", "Licenses & Certifications"). Os scores tendem a diferir — use o dashboard para comparar e otimizar.
 
 ---
 
@@ -120,7 +126,7 @@ uvicorn main:app --reload --port 8000
 | Método | Rota | Descrição |
 |--------|------|-----------|
 | `GET` | `/health` | Health check |
-| `GET` | `/stacks` | Lista todas as 17 stacks |
+| `GET` | `/stacks` | Lista todas as 228 competências |
 | `GET` | `/stack/{id}` | Exemplo completo + curiosidade de uma stack |
 | `POST` | `/upload` | Recebe PDF, detecta stacks |
 | `POST` | `/processar/{session_id}` | Publica na fila e inicia consumer |
@@ -135,9 +141,11 @@ uvicorn main:app --reload --port 8000
 - **Stacks grid** — cards coloridos com filtro por categoria (Backend, Frontend, DevOps, Database...)
 - **Code Viewer** — clique em qualquer stack para ver um exemplo de código real com syntax highlight
 - **💡 Você sabia?** — curiosidade histórica/técnica sobre cada tecnologia
-- **Modo demo** — funciona 100% offline, simulando o pipeline completo com 17 stacks
+- **Modo demo** — funciona 100% offline, simulando o pipeline completo com stacks de exemplo
 - **Dark/Light theme** — toggle com transição suave e persistência
 - **Drag & drop** — arraste PDF diretamente na upload zone
+- **Dashboard ATS** — score de 0-100 com 6 dimensões, sugestões priorizadas por impacto
+- **Multi-formato** — reconhece seções em PT-BR e EN (incluindo PDFs exportados do LinkedIn)
 
 ---
 
@@ -166,13 +174,20 @@ def callback(ch, method, properties, body):
 
 ---
 
-## 🎯 Stacks Detectadas
+## 🎯 Competências Detectadas
 
-<div align="center">
+228 competências em 8 áreas profissionais:
 
-`Python` · `Flask` · `FastAPI` · `Django` · `React` · `Angular` · `TypeScript` · `JavaScript` · `Node.js` · `Docker` · `PostgreSQL` · `SQL` · `C#` · `.NET` · `RabbitMQ` · `Redis` · `Pandas`
-
-</div>
+| Área | Qtd | Exemplos |
+|------|-----|----------|
+| ⚙️ TI | 127 | Python, React, Docker, AWS, SOLID, Design Patterns, GitHub Copilot |
+| 🏥 Saúde | 25 | Enfermagem, Fisioterapia, Nutrição, Farmácia |
+| 📚 Educação | 17 | Pedagogia, EAD, Alfabetização, Libras |
+| 🎨 Artes e Design | 18 | UI/UX, Figma, Motion Design, Fotografia |
+| 📣 Marketing | 12 | SEO, Tráfego Pago, Inbound, CRM |
+| 💰 Finanças | 14 | Contabilidade, Auditoria, FP&A, Valuation |
+| 🏗️ Engenharia | 9 | Civil, Mecânica, Elétrica, Automação |
+| 📦 Logística | 6 | WMS, ERP, Supply Chain, Última Milha |
 
 ---
 
@@ -190,10 +205,12 @@ def callback(ch, method, properties, body):
 ```
 stack-radar/
 ├── backend/
-│   ├── main.py              ← FastAPI + RabbitMQ + WebSocket
-│   ├── test_main.py         ← 132 testes unitários (pytest)
+│   ├── main.py              ← FastAPI + RabbitMQ + WebSocket + ATS Engine
+│   ├── test_main.py         ← 151 testes unitários (pytest)
 │   ├── requirements.txt
 │   └── Dockerfile           ← build local
+├── tabelas/
+│   └── stacks_taxonomy.json ← 228 competências em 8 áreas + config ATS
 ├── docs/
 │   ├── card_config.json     ← config do evidence card
 │   └── evidencia-card.svg   ← card de evidência (README)
