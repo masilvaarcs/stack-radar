@@ -35,9 +35,9 @@
 
 ## 💡 O que é?
 
-Upload de currículo em PDF → extração de texto → detecção automática de stacks → processamento via **message broker real** → exibição de exemplos de código ao vivo no browser.
+Upload de currículo em PDF → extração de texto → detecção automática de stacks → processamento via **message broker real** → exibição de exemplos de código e curiosidades ao vivo no browser.
 
-Cada stack detectada vira uma **mensagem AMQP** que é publicada, enfileirada, consumida e entregue via WebSocket — tudo visível em tempo real.
+Cada stack detectada vira uma **mensagem AMQP** que é publicada, enfileirada, consumida e entregue via WebSocket — tudo visível em tempo real. Ao clicar em qualquer stack, um **code viewer** moderno exibe um exemplo de código real e uma **curiosidade** sobre a tecnologia.
 
 ---
 
@@ -121,7 +121,7 @@ uvicorn main:app --reload --port 8000
 |--------|------|-----------|
 | `GET` | `/health` | Health check |
 | `GET` | `/stacks` | Lista todas as 17 stacks |
-| `GET` | `/stack/{id}` | Exemplo completo de uma stack |
+| `GET` | `/stack/{id}` | Exemplo completo + curiosidade de uma stack |
 | `POST` | `/upload` | Recebe PDF, detecta stacks |
 | `POST` | `/processar/{session_id}` | Publica na fila e inicia consumer |
 | `WS` | `/ws/{session_id}` | WebSocket — eventos em tempo real |
@@ -178,6 +178,7 @@ def callback(ch, method, properties, body):
 stack-radar/
 ├── backend/
 │   ├── main.py              ← FastAPI + RabbitMQ + WebSocket
+│   ├── test_main.py         ← 122 testes unitários (pytest)
 │   ├── requirements.txt
 │   └── Dockerfile           ← build local
 ├── docs/

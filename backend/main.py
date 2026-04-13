@@ -38,6 +38,7 @@ STACK_DB: dict = {
     "python": {
         "name": "Python", "icon": "🐍", "color": "#3776AB", "category": "Backend",
         "description": "Linguagem versátil para backend, data science e automação.",
+        "curiosity": "O nome Python vem do grupo de comédia Monty Python, não da cobra. Guido van Rossum criou a linguagem em 1991 enquanto assistia ao programa. Python é a linguagem mais ensinada em universidades dos EUA desde 2014.",
         "example_title": "API REST com Flask",
         "example": """\
 from flask import Flask, jsonify, request
@@ -62,6 +63,7 @@ if __name__ == "__main__":
     "flask": {
         "name": "Flask", "icon": "🌶️", "color": "#44b78b", "category": "Backend",
         "description": "Microframework web leve e flexível para Python.",
+        "curiosity": "Flask começou como uma piada de 1º de abril em 2010 por Armin Ronacher. O nome é um trocadilho com Bottle (outro microframework). Apesar de 'micro', Flask é usado pela Netflix, Reddit e LinkedIn em produção.",
         "example_title": "Blueprint com autenticação JWT",
         "example": """\
 from flask import Flask, Blueprint, request, jsonify
@@ -99,6 +101,7 @@ def login():
     "fastapi": {
         "name": "FastAPI", "icon": "⚡", "color": "#009688", "category": "Backend",
         "description": "Framework moderno e rápido para APIs com tipagem Python.",
+        "curiosity": "FastAPI gera documentação Swagger/OpenAPI automaticamente a partir dos type hints. Nos benchmarks, é comparável a Node.js e Go em performance. Criado por Sebastián Ramírez em 2018, já é o 3º framework Python mais usado.",
         "example_title": "CRUD assíncrono com Pydantic",
         "example": """\
 from fastapi import FastAPI, HTTPException
@@ -138,6 +141,7 @@ async def atualizar(item_id: int, item: Item):
     "django": {
         "name": "Django", "icon": "🎸", "color": "#44B78B", "category": "Backend",
         "description": "Framework full-stack com ORM, admin e autenticação incluídos.",
+        "curiosity": "Django foi criado em 2003 para o jornal Lawrence Journal-World no Kansas. O nome homenageia o guitarrista de jazz Django Reinhardt. Instagram, Spotify e Pinterest usam Django para servir bilhões de requests.",
         "example_title": "Model + View com Django ORM",
         "example": """\
 # models.py
@@ -177,6 +181,7 @@ class ProdutoView(View):
     "react": {
         "name": "React", "icon": "⚛️", "color": "#61DAFB", "category": "Frontend",
         "description": "Biblioteca para construção de interfaces declarativas e reativas.",
+        "curiosity": "React foi criado pelo Facebook em 2011 para resolver problemas do chat. O Virtual DOM foi revolucionário — antes, manipular DOM diretamente era o padrão. Em 2026, React alimenta Facebook, Instagram, WhatsApp Web, Netflix e Airbnb.",
         "example_title": "Hook useFetch + Context API",
         "example": """\
 import { useState, useEffect, useCallback, createContext, useContext } from "react";
@@ -215,6 +220,7 @@ export function useFetch(url) {
     "angular": {
         "name": "Angular", "icon": "🔺", "color": "#DD0031", "category": "Frontend",
         "description": "Framework completo com DI, RxJS e roteamento integrados.",
+        "curiosity": "Angular foi reescrito do zero pelo Google em 2016 (Angular 2+), quebrando compatibilidade com AngularJS. Usa TypeScript como linguagem padrão. Google usa Angular em mais de 600 aplicações internas, incluindo Google Cloud Console.",
         "example_title": "Service + RxJS + Component",
         "example": """\
 // produto.service.ts
@@ -246,6 +252,7 @@ export class ProdutoService {
     "typescript": {
         "name": "TypeScript", "icon": "🔷", "color": "#3178C6", "category": "Frontend",
         "description": "Superset tipado do JavaScript para projetos escaláveis.",
+        "curiosity": "TypeScript foi criado por Anders Hejlsberg (o mesmo criador do C# e Delphi) na Microsoft em 2012. Todo código JavaScript válido é TypeScript válido. Em 2023, TypeScript ultrapassou Java como a 3ª linguagem mais popular no GitHub.",
         "example_title": "Repositório genérico + Decorators",
         "example": """\
 interface Entidade { id: number; }
@@ -285,6 +292,7 @@ console.log(ativos.map(u => u.nome)); // ["Marcos"]"""
     "javascript": {
         "name": "JavaScript", "icon": "🟡", "color": "#F7DF1E", "category": "Frontend",
         "description": "Linguagem universal da web, client e server-side.",
+        "curiosity": "JavaScript foi criado em apenas 10 dias por Brendan Eich em 1995 na Netscape. O nome foi uma jogada de marketing para surfar na popularidade do Java. É a linguagem mais usada do mundo por 12 anos consecutivos no Stack Overflow.",
         "example_title": "EventBus + Promise.all",
         "example": """\
 // EventBus customizado com tipagem JSDoc
@@ -323,6 +331,7 @@ unsub();"""
     "node": {
         "name": "Node.js", "icon": "🟢", "color": "#339933", "category": "Backend",
         "description": "Runtime JavaScript server-side baseado no V8.",
+        "curiosity": "Node.js foi criado por Ryan Dahl em 2009 porque ficou frustrado com o Apache não lidar bem com conexões simultâneas. O event loop single-thread pode processar milhares de conexões. Netflix reduziu o tempo de startup de 40min para 1min ao migrar para Node.js.",
         "example_title": "Express + Zod + Middleware",
         "example": """\
 import express from "express";
@@ -367,6 +376,7 @@ app.listen(3000, () => console.log("🚀 :3000"));"""
     "docker": {
         "name": "Docker", "icon": "🐳", "color": "#2496ED", "category": "DevOps",
         "description": "Containerização de aplicações para ambientes reproduzíveis.",
+        "curiosity": "Docker foi lançado em 2013 como projeto interno da dotCloud. A logo do Docker (Moby Dock) é uma baleia carregando containers — uma referência visual perfeita. Em 5 anos, Docker mudou completamente como software é deployado no mundo.",
         "example_title": "Dockerfile + docker-compose completo",
         "example": """\
 # Dockerfile — imagem de produção otimizada
@@ -416,6 +426,7 @@ volumes:
     "postgresql": {
         "name": "PostgreSQL", "icon": "🐘", "color": "#336791", "category": "Database",
         "description": "Banco relacional robusto com suporte a JSON, window functions e CTEs.",
+        "curiosity": "PostgreSQL existe desde 1986 como projeto acadêmico da UC Berkeley. O nome 'Postgres' vem de 'Post-Ingres' (seu banco antecessor). É o banco mais admirado do Stack Overflow Survey 2023 e usado pela Apple, Instagram e Twitch.",
         "example_title": "Window Functions + CTE avançado",
         "example": """\
 -- Ranking de vendas por mês com variação e quartil
@@ -454,6 +465,7 @@ ORDER BY mes DESC, pos;"""
     "sql": {
         "name": "SQL", "icon": "🗄️", "color": "#E38C00", "category": "Database",
         "description": "Linguagem padrão para consulta e manipulação de bancos relacionais.",
+        "curiosity": "SQL foi criado na IBM em 1970 por Edgar F. Codd e inicialmente se chamava SEQUEL (Structured English Query Language). Mais de 50 anos depois, SQL ainda é a skill #1 mais requisitada em vagas de dados. Toda grande empresa do planeta usa SQL.",
         "example_title": "JOIN complexo com segmentação de clientes",
         "example": """\
 -- Relatório de clientes com segmentação e recência
@@ -483,6 +495,7 @@ ORDER BY receita_total DESC;"""
     "csharp": {
         "name": "C#", "icon": "💜", "color": "#68217A", "category": "Backend",
         "description": "Linguagem orientada a objetos da Microsoft para .NET.",
+        "curiosity": "C# foi criado por Anders Hejlsberg na Microsoft em 2000 como resposta ao Java. O '#' no nome simboliza quatro '+' sobrepostos (C++++). C# é usado em jogos (Unity), web (ASP.NET), mobile (MAUI) e até IoT.",
         "example_title": "Repository Pattern + ASP.NET Core",
         "example": """\
 // IRepository.cs — interface genérica
@@ -527,6 +540,7 @@ public class PedidoController(IRepository<Pedido> repo) : ControllerBase
     "dotnet": {
         "name": ".NET", "icon": "🟣", "color": "#512BD4", "category": "Backend",
         "description": "Plataforma Microsoft para aplicações modernas e de alta performance.",
+        "curiosity": ".NET começou em 2002 rodando apenas Windows. Em 2016, Microsoft open-sourced e lançou .NET Core cross-platform. O .NET 8 (2023) é até 40% mais rápido que versões anteriores e roda em Linux, macOS e até WebAssembly.",
         "example_title": "Worker Service consumindo RabbitMQ",
         "example": """\
 // PedidoWorker.cs — IHostedService com RabbitMQ
@@ -570,6 +584,7 @@ public sealed class PedidoWorker(
     "rabbitmq": {
         "name": "RabbitMQ", "icon": "🐇", "color": "#FF6600", "category": "Messaging",
         "description": "Message broker para comunicação assíncrona entre serviços.",
+        "curiosity": "RabbitMQ foi criado em 2007 pela Rabbit Technologies usando Erlang — linguagem projetada pela Ericsson para telecom. O coelho no nome representa velocidade.  RabbitMQ processa milhões de mensagens por segundo e é usado pela NASA, Reddit e Instagram.",
         "example_title": "Fanout Exchange — broadcast a múltiplos consumers",
         "example": """\
 import pika, json
@@ -620,6 +635,7 @@ def consumir(servico: str, handler) -> None:
     "redis": {
         "name": "Redis", "icon": "🔴", "color": "#DC382D", "category": "Cache",
         "description": "Store in-memory ultrarrápido para cache, sessão e pub/sub.",
+        "curiosity": "Redis significa 'REmote DIctionary Server' e foi criado por Salvatore Sanfilippo em 2009. Opera inteiramente em memória RAM com latência menor que 1ms. Twitter usa Redis para armazenar timelines e GitHub para filas de jobs em background.",
         "example_title": "Cache decorator + Pub/Sub assíncrono",
         "example": """\
 import redis.asyncio as aioredis
@@ -663,6 +679,7 @@ async def assinar(canal: str) -> None:
     "pandas": {
         "name": "Pandas", "icon": "🐼", "color": "#E70488", "category": "Data Science",
         "description": "Biblioteca Python para análise e manipulação de dados tabulares.",
+        "curiosity": "Pandas foi criado por Wes McKinney em 2008 enquanto trabalhava no mercado financeiro. O nome vem de 'PANel DAta'. Um DataFrame do Pandas pode processar milhões de linhas sem banco de dados. É a biblioteca #1 para data science em Python.",
         "example_title": "Análise exploratória + Pivot Table",
         "example": """\
 import pandas as pd
@@ -729,7 +746,10 @@ def detectar_stacks(texto: str) -> list[dict]:
     encontradas, vistas = [], set()
     for stack_id, keywords in KEYWORDS.items():
         for kw in keywords:
-            padrao = r'\b' + re.escape(kw) + r'\b'
+            # Usa word-boundary apenas quando kw começa/termina com char alfanumérico
+            left  = r'\b' if kw[0].isalnum() else r'(?<!\w)'
+            right = r'\b' if kw[-1].isalnum() else r'(?!\w)'
+            padrao = left + re.escape(kw) + right
             if re.search(padrao, texto_lower) and stack_id not in vistas:
                 if stack_id in STACK_DB:
                     encontradas.append({"id": stack_id, **STACK_DB[stack_id]})
