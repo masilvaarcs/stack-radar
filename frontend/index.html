@@ -213,7 +213,7 @@ html.transitioning *::after {
 .upload-zone::before {
   content: ''; position: absolute; inset: 0;
   background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(245,158,11,.04), transparent);
-  opacity: 0; transition: opacity .3s;
+  opacity: 0; transition: opacity .3s; pointer-events: none;
 }
 .upload-zone:hover, .upload-zone.drag-over {
   border-color: rgba(245,158,11,.5); background: rgba(245,158,11,.04);
