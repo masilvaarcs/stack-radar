@@ -450,3 +450,681 @@ class TestTaxonomyIntegrity:
             assert info.get("icon"), f"{sid} missing icon"
             assert info.get("color"), f"{sid} missing color"
             assert info.get("category"), f"{sid} missing category"
+
+
+# ─────────────────────────────────────────────────────────────
+#  TESTES DE REGRESSÃO ATS — FORMATOS DE PDF REAIS
+#  Cada classe simula o texto extraído de um formato real.
+#  NUNCA liberar commit se algum destes falhar.
+# ─────────────────────────────────────────────────────────────
+
+class TestATSFormatoCVAtsHtml:
+    """CV gerado de HTML otimizado para ATS — seções PT-BR, layout limpo."""
+
+    CV = """
+MARCOS SANTOS DA SILVA
+Desenvolvedor Full Stack Sênior | .NET C# · Angular · Python | +20 anos de experiência
+
+Gravataí / RS  |  (51) 98422-8067  |  masilva.arcs@gmail.com
+LinkedIn: linkedin.com/in/marcosprogramador  |  Portfólio: masilvaarcs.github.io/portfolio-hub
+
+RESUMO PROFISSIONAL
+
+Desenvolvedor Full Stack Sênior com mais de 20 anos de experiência em sistemas críticos, ERP e WMS.
+Especialista em .NET C#, Angular e Python, com aplicação consistente de arquitetura limpa, SOLID e Design Patterns.
+
+COMPETÊNCIAS TÉCNICAS
+
+Back-End: .NET, C#, ASP.NET Core, Web API, API RESTful, Microserviços, Entity Framework Core, LINQ, JWT, OAuth
+Front-End: Angular, TypeScript, JavaScript, HTML5, CSS3, RxJS, React (básico)
+Bancos de Dados: SQL Server, Oracle, PostgreSQL, MySQL, PL/SQL, Stored Procedures
+DevOps e Cloud: Azure DevOps, Docker, CI/CD, Git, GitHub, GitLab, Pipelines
+Automação e Scripts: Python, PowerShell, NSIS, Node.js
+Qualidade e Arquitetura: SOLID, Clean Code, Design Patterns, Unit Testing, xUnit, NUnit, TDD
+IA e Produtividade: GitHub Copilot, Claude AI
+Metodologias: Scrum, Kanban, Agile
+
+EXPERIÊNCIA PROFISSIONAL
+
+Octafy LAD (operação Perto S.A.)                                       Dez 2024 - Mar 2026
+Desenvolvedor .NET Sênior (C#) — promovido a Desenvolvedor Full Stack (Angular | .NET)
+
+Desenvolvi e evoluí 25 componentes de pages em Angular (84% das rotas concluídas), integrados aos fluxos operacionais
+Integrei frontend Angular, WebAPI RESTful (.NET C#), WebServices ASMX/SOAP, SQL Server e equipamentos TCR
+Criei scripts Python para geração de dashboards de evolução, análise automatizada de commits
+Prototipei POC em .NET MAUI reproduzindo operações do frontend Angular
+Elaborei documentação técnica completa: relatórios de evolução, FAQ Técnico (v1.3.0)
+Utilizei GitHub Copilot e Claude AI como ferramentas para análise de lógica complexa
+
+FORMAÇÃO ACADÊMICA
+
+Escola Estadual Marechal Mascarenhas de Moraes
+Técnico em Processamento de Dados — Informática | 1997 – 1999
+
+CERTIFICAÇÕES
+
+SFPC — Scrum Foundation Professional Certificate (CertiProf)
+DEPC — DevOps Essentials Professional Certificate (CertiProf)
+KIKF — Kanban Foundation (CertiProf)
+
+IDIOMAS
+
+Português: Nativo
+Inglês: Intermediário (leitura técnica)
+
+Portfólio: masilvaarcs.github.io/portfolio-hub
+https://github.com/masilvaarcs
+    """
+
+    def test_score_minimo_80(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["score"] >= 80, f"CV ATS HTML scored {ats['score']}, expected >= 80"
+
+    def test_classificacao_excelente(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["classificacao"] == "Excelente", f"Got '{ats['classificacao']}'"
+
+    def test_todas_7_secoes_detectadas(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        secoes = ats["detalhes"]["secoes"]["encontradas"]
+        for sec_key in ["summary", "experience", "education", "skills", "certifications", "languages", "projects"]:
+            assert secoes[sec_key]["found"], f"Seção '{sec_key}' não detectada no CV ATS HTML"
+
+    def test_todos_5_contatos_detectados(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        contato = ats["detalhes"]["contato"]["encontrados"]
+        for ct in ["email", "phone", "linkedin", "github", "portfolio"]:
+            assert contato[ct], f"Contato '{ct}' não detectado no CV ATS HTML"
+
+    def test_verbos_minimo_5(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        total = ats["detalhes"]["verbos_acao"]["total"]
+        assert total >= 5, f"Apenas {total} verbos detectados, esperado >= 5"
+
+    def test_metricas_minimo_2(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        total = ats["detalhes"]["metricas_quantificaveis"]["total"]
+        assert total >= 2, f"Apenas {total} métricas detectadas, esperado >= 2"
+
+    def test_stacks_minimo_30(self):
+        stacks = detectar_stacks(self.CV)
+        assert len(stacks) >= 30, f"Apenas {len(stacks)} stacks, esperado >= 30"
+
+    def test_stacks_obrigatorias_presentes(self):
+        stacks = detectar_stacks(self.CV)
+        ids = {s["id"] for s in stacks}
+        obrigatorias = {"python", "csharp", "angular", "dotnet", "docker", "sql", "postgresql", "github_copilot"}
+        faltando = obrigatorias - ids
+        assert not faltando, f"Stacks obrigatórias não detectadas: {faltando}"
+
+    def test_secao_resumo_via_ptbr(self):
+        """Garante que 'RESUMO PROFISSIONAL' mapeia para seção 'summary'."""
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["detalhes"]["secoes"]["encontradas"]["summary"]["found"]
+
+    def test_secao_competencias_via_ptbr(self):
+        """Garante que 'COMPETÊNCIAS TÉCNICAS' mapeia para seção 'skills'."""
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["detalhes"]["secoes"]["encontradas"]["skills"]["found"]
+
+
+class TestATSFormatoVisualDesign:
+    """CV visual com QR codes, badges, ícones, layout 2 colunas."""
+
+    CV = """
+Marcos Santos da Silva
+Desenvolvedor Full Stack Sênior | .NET C# · Angular · Python | +20 anos de experiência
+
+📍Gravataí / RS  📱(51) 98422-8067   ✉️masilva.arcs@gmail.com   🔗linkedin.com/in/marcosprogramador
+🌐masilvaarcs.github.io/portfolio-hub
+
+RESUMO PROFISSIONAL
+
+Desenvolvedor Full Stack Sênior com mais de 20 anos de experiência em sistemas críticos, ERP e WMS.
+Especialista em .NET C#, Angular e Python. Certificado em Scrum (SFPC®), DevOps (DEPC®) e Kanban (KIKF™).
+Utilizo ferramentas de IA como GitHub Copilot e Claude AI como aliados estratégicos.
+
++20                            15+                 6                    Full Stack
+ANOS DE EXPERIÊNCIA     EMPRESAS ATENDIDAS   CERTIFICAÇÕES      .NET · ANGULAR · PYTHON
+
+STACK TÉCNICA
+
+BACK-END                                              FRONT-END
+.NET C# · ASP.NET Core · Web API · API RESTful ·      Angular · TypeScript · JavaScript · HTML5 · CSS3 · RxJS ·
+Microserviços · Entity Framework Core · LINQ · JWT     React (básico)
+
+BANCOS DE DADOS                                       DEVOPS & CLOUD
+SQL Server · Oracle · PostgreSQL · MySQL · PL/SQL ·    Azure DevOps · Docker · CI/CD · Git · GitHub · GitLab ·
+Stored Procedures                                      Pipelines
+
+AUTOMAÇÃO & SCRIPTS                                   QUALIDADE & ARQUITETURA
+Python · PowerShell · NSIS · Node.js                   SOLID · Clean Code · Design Patterns · Unit Testing · xUnit · NUnit · TDD
+
+IA & PRODUTIVIDADE                                    METODOLOGIAS
+GitHub Copilot · Claude AI · ChatGPT                   Scrum · Kanban · Agile · Sprints · Daily · Planning
+
+EXPERIÊNCIA PROFISSIONAL
+
+Octafy LAD (operação Perto S.A.)                                        Dez 2024 - Mar 2026
+Desenvolvedor .NET Sênior (C#)  PROMOVIDO  Desenvolvedor Full Stack (Angular | .NET)
+
+Desenvolvi e evoluí 25 componentes de pages em Angular (84% das rotas concluídas)
+Integrei frontend Angular ↔ WebAPI RESTful (.NET C#) ↔ WebServices ASMX/SOAP ↔ SQL Server
+Criei scripts Python para geração de dashboards de evolução
+Prototipei POC em .NET MAUI reproduzindo operações do frontend Angular
+Elaborei documentação técnica completa
+Utilizei GitHub Copilot e Claude AI como ferramentas para análise de lógica complexa
+
+CERTIFICAÇÕES
+
+SFPC® — Scrum Foundation (CertiProf)
+DEPC® — DevOps Essentials (CertiProf)
+KIKF™ — Kanban Foundation (CertiProf)
+
+IA & PRODUTIVIDADE
+GitHub Copilot · Claude AI · Assistentes de IA Generativa
+
+FORMAÇÃO ACADÊMICA                                    IDIOMAS
+Escola Estadual Marechal Mascarenhas de Moraes        Português — Nativo
+Técnico em Processamento de Dados — Informática       Inglês — Intermediário (leitura técnica)
+1997 – 1999
+
+LinkedIn: linkedin.com/in/marcosprogramador
+Portfólio: masilvaarcs.github.io/portfolio-hub
+GitHub: github.com/masilvaarcs
+    """
+
+    def test_score_minimo_75(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["score"] >= 75, f"CV Visual scored {ats['score']}, expected >= 75"
+
+    def test_classificacao_bom_ou_excelente(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["classificacao"] in ("Excelente", "Bom"), f"Got '{ats['classificacao']}'"
+
+    def test_todas_7_secoes_detectadas(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        secoes = ats["detalhes"]["secoes"]["encontradas"]
+        for sec_key in ["summary", "experience", "education", "skills", "certifications", "languages", "projects"]:
+            assert secoes[sec_key]["found"], f"Seção '{sec_key}' não detectada no CV Visual"
+
+    def test_todos_5_contatos_detectados(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        contato = ats["detalhes"]["contato"]["encontrados"]
+        for ct in ["email", "phone", "linkedin", "github", "portfolio"]:
+            assert contato[ct], f"Contato '{ct}' não detectado no CV Visual"
+
+    def test_emojis_nao_atrapalham_contato(self):
+        """Emojis 📱✉️🔗🌐 não devem impedir detecção de contatos."""
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        contato = ats["detalhes"]["contato"]["encontrados"]
+        assert contato["email"], "Email com emoji ✉️ não detectado"
+        assert contato["phone"], "Telefone com emoji 📱 não detectado"
+
+    def test_layout_2_colunas_nao_perde_stacks(self):
+        """Layout lado-a-lado não deve impedir detecção de stacks."""
+        stacks = detectar_stacks(self.CV)
+        ids = {s["id"] for s in stacks}
+        essenciais = {"angular", "csharp", "dotnet", "python", "docker", "sql", "postgresql"}
+        faltando = essenciais - ids
+        assert not faltando, f"Layout 2 colunas perdeu stacks: {faltando}"
+
+    def test_verbos_minimo_5(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        total = ats["detalhes"]["verbos_acao"]["total"]
+        assert total >= 5, f"Apenas {total} verbos detectados"
+
+    def test_metricas_minimo_2(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        total = ats["detalhes"]["metricas_quantificaveis"]["total"]
+        assert total >= 2, f"Apenas {total} métricas detectadas"
+
+    def test_stacks_minimo_30(self):
+        stacks = detectar_stacks(self.CV)
+        assert len(stacks) >= 30, f"Apenas {len(stacks)} stacks no CV Visual"
+
+
+class TestATSFormatoPDFGupy:
+    """PDF exportado pela plataforma Gupy — seções EN, labels diferentes."""
+
+    CV = """
+Marcos Santos da Silva
+CPF: 80438407091
+Rua Pereira Passos, 31 , Gravataí, Rio Grande do Sul, Brasil
+Gravataí/RS - Zip Code: 94040-230
++5551984228067
+masilva.arcs@gmail.com
+
+Education
+Vocational school (Complete)
+Escola Estadual Marechal Mascarenhas de Moraes - Técnico em Processamento de Dados, Informática
+3/1997 - 12/1999
+
+Professional experience
+Company: Octafy LAD (operação Perto S.A.)
+Position: Desenvolvedor .NET Sênior (C#) — promovido a Desenvolvedor Full Stack (Angular | .NET) (12/2024 - 3/2026)
+Main activities: Atuação inicialmente como Desenvolvedor .NET Sênior em sistemas críticos do setor financeiro.
+
+Desenvolvi e evoluí 25 componentes de pages em Angular (84% das rotas concluídas)
+Integrei frontend Angular, WebAPI RESTful (.NET C#), WebServices ASMX/SOAP, SQL Server
+Criei scripts Python para geração de dashboards de evolução
+Prototipei POC em .NET MAUI reproduzindo operações do frontend Angular
+Elaborei documentação técnica completa
+Utilizei GitHub Copilot e Claude AI como ferramentas para análise de lógica complexa
+
+Tecnologias: Angular, .NET C#, ASP.NET Core, Web API, WebServices ASMX, SQL Server, Python, NSIS, PowerShell, IIS, .NET MAUI, GitHub Copilot, Claude AI, Scrum
+
+Company: Grupo Apisul
+Position: Desenvolvedor .NET (10/2023 - 7/2024)
+Tecnologias: .NET, SQL Server, Azure DevOps, CI/CD, Unit Testing, HTML, CSS, JavaScript, Agile
+
+Company: PRODATA MOBILITY BRASIL
+Position: Desenvolvedor .NET (12/2021 - 5/2023)
+Tecnologias: .NET, Angular, Node.js, Oracle, Crystal Reports
+
+Company: Brazpine
+Position: Desenvolvedor .NET | Visual Basic (5/2020 - 11/2021)
+Tecnologias: .NET, Visual Basic, Oracle, PostgreSQL, Azure DevOps, ERP
+
+Achievements
+Achievement: Course
+Title: JAVA JRE E JDK: COMPILE E EXECUTE O SEU PROGRAMA
+Description: Alura (no período da BRAZPINE)
+Carga horária: 8 horas
+
+Achievement: Certificate
+Title: IA na Prática
+Description: Desenvolvimento de aplicação Python, integração com modelo GPT da OpenAI
+Data de emissão: 22/08/2024
+
+Achievement: Certificate
+Title: Iniciando com ASP.NET Core
+Carga horária: 02 horas
+Conclusão: 27/05/2021
+
+Languages
+Language: Portuguese
+Level: Native/Fluent
+Language: English
+Level: Intermediate
+
+Social network profiles
+LinkedIn: https://www.linkedin.com/in/marcosprogramador/
+    """
+
+    def test_score_minimo_65(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["score"] >= 65, f"CV Gupy scored {ats['score']}, expected >= 65"
+
+    def test_classificacao_bom_ou_superior(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["classificacao"] in ("Excelente", "Bom"), f"Got '{ats['classificacao']}'"
+
+    def test_secao_education_en(self):
+        """Gupy usa 'Education' (EN) — deve mapear para 'education'."""
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["detalhes"]["secoes"]["encontradas"]["education"]["found"], "Seção 'Education' (EN) não reconhecida"
+
+    def test_secao_professional_experience_en(self):
+        """Gupy usa 'Professional experience' — deve mapear para 'experience'."""
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["detalhes"]["secoes"]["encontradas"]["experience"]["found"], "'Professional experience' não reconhecida"
+
+    def test_secao_achievements_mapeia_projects(self):
+        """Gupy usa 'Achievements' — deve mapear para 'projects'."""
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["detalhes"]["secoes"]["encontradas"]["projects"]["found"], "'Achievements' não mapeou para 'projects'"
+
+    def test_secao_languages_en(self):
+        """Gupy usa 'Languages' (EN) — deve mapear para 'languages'."""
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["detalhes"]["secoes"]["encontradas"]["languages"]["found"], "'Languages' (EN) não reconhecida"
+
+    def test_minimo_5_secoes(self):
+        """Gupy deve ter pelo menos 5 das 7 seções reconhecidas."""
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        secoes = ats["detalhes"]["secoes"]["encontradas"]
+        total = sum(1 for s in secoes.values() if s["found"])
+        assert total >= 5, f"Apenas {total}/7 seções detectadas no formato Gupy"
+
+    def test_email_detectado(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["detalhes"]["contato"]["encontrados"]["email"], "Email não detectado no formato Gupy"
+
+    def test_phone_detectado(self):
+        """Telefone +5551984228067 (formato Gupy sem separadores) deve ser detectado."""
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["detalhes"]["contato"]["encontrados"]["phone"], "Telefone formato Gupy não detectado"
+
+    def test_linkedin_detectado(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["detalhes"]["contato"]["encontrados"]["linkedin"], "LinkedIn não detectado no formato Gupy"
+
+    def test_verbos_minimo_5(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        total = ats["detalhes"]["verbos_acao"]["total"]
+        assert total >= 5, f"Apenas {total} verbos no formato Gupy"
+
+    def test_metricas_minimo_2(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        total = ats["detalhes"]["metricas_quantificaveis"]["total"]
+        assert total >= 2, f"Apenas {total} métricas no formato Gupy"
+
+    def test_stacks_minimo_20(self):
+        stacks = detectar_stacks(self.CV)
+        assert len(stacks) >= 20, f"Apenas {len(stacks)} stacks no formato Gupy"
+
+    def test_stacks_core_presentes(self):
+        stacks = detectar_stacks(self.CV)
+        ids = {s["id"] for s in stacks}
+        core = {"python", "csharp", "angular", "dotnet", "sql"}
+        faltando = core - ids
+        assert not faltando, f"Stacks core não detectadas no Gupy: {faltando}"
+
+
+class TestATSFormatoLinkedIn:
+    """PDF exportado pelo LinkedIn — seções EN, formato especial."""
+
+    CV = """
+Marcos Santos da Silva
+Desenvolvedor Full Stack Sênior
+
+Gravataí, Rio Grande do Sul, Brasil
+
+Summary
+Desenvolvedor Full Stack Sênior com mais de 20 anos de experiência em sistemas críticos.
+Especialista em .NET C#, Angular e Python.
+
+Top Skills
+.NET, C#, Angular, Python, SQL Server, Docker, Azure DevOps
+
+Experience
+Octafy LAD (operação Perto S.A.)
+Desenvolvedor Full Stack
+Dec 2024 - Mar 2026
+
+Desenvolvi e evoluí 25 componentes em Angular (84% concluídas)
+Integrei frontend Angular, WebAPI RESTful (.NET C#), SQL Server
+Criei scripts Python para dashboards
+Implementei CI/CD pipelines com Azure DevOps
+
+Grupo Apisul
+Desenvolvedor .NET
+Oct 2023 - Jul 2024
+
+Education
+Escola Estadual Marechal Mascarenhas de Moraes
+Técnico em Processamento de Dados
+1997 - 1999
+
+Licenses & Certifications
+SFPC — Scrum Foundation Professional Certificate - CertiProf
+DEPC — DevOps Essentials Professional Certificate - CertiProf
+
+Languages
+Portuguese (Native or Bilingual)
+English (Limited Working)
+
+Contact
+masilva.arcs@gmail.com
+linkedin.com/in/marcosprogramador
+    """
+
+    def test_score_minimo_55(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["score"] >= 55, f"CV LinkedIn scored {ats['score']}, expected >= 55"
+
+    def test_secao_summary_en(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["detalhes"]["secoes"]["encontradas"]["summary"]["found"], "'Summary' (LinkedIn EN) não reconhecida"
+
+    def test_secao_experience_en(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["detalhes"]["secoes"]["encontradas"]["experience"]["found"], "'Experience' (LinkedIn EN) não reconhecida"
+
+    def test_secao_education_en(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["detalhes"]["secoes"]["encontradas"]["education"]["found"], "'Education' (LinkedIn EN) não reconhecida"
+
+    def test_secao_languages_en(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["detalhes"]["secoes"]["encontradas"]["languages"]["found"], "'Languages' (LinkedIn EN) não reconhecida"
+
+    def test_secao_licenses_certifications(self):
+        """LinkedIn usa 'Licenses & Certifications' — deve mapear para 'certifications'."""
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["detalhes"]["secoes"]["encontradas"]["certifications"]["found"], "'Licenses & Certifications' não reconhecida"
+
+    def test_secao_top_skills(self):
+        """LinkedIn usa 'Top Skills' — deve mapear para 'skills'."""
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["detalhes"]["secoes"]["encontradas"]["skills"]["found"], "'Top Skills' (LinkedIn) não reconhecida"
+
+    def test_email_detectado(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["detalhes"]["contato"]["encontrados"]["email"]
+
+    def test_linkedin_detectado(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["detalhes"]["contato"]["encontrados"]["linkedin"]
+
+    def test_stacks_core_presentes(self):
+        stacks = detectar_stacks(self.CV)
+        ids = {s["id"] for s in stacks}
+        core = {"python", "csharp", "angular", "dotnet", "docker", "sql"}
+        faltando = core - ids
+        assert not faltando, f"Stacks core não detectadas no LinkedIn: {faltando}"
+
+
+class TestATSFormatoCanva:
+    """CV do Canva — layout 2 colunas, texto pode vir embaralhado."""
+
+    CV = """
+Maria Oliveira                                  Contato
+Desenvolvedora Python Pleno                     maria@email.com
+São Paulo, SP                                   (11) 91234-5678
+                                                linkedin.com/in/maria-oliveira
+                                                github.com/mariaoliveira
+
+Sobre Mim                                       Habilidades
+Desenvolvedora Python com 5 anos de             Python, Django, FastAPI,
+experiência em APIs, automação e dados.          PostgreSQL, Docker, AWS,
+                                                 Redis, CI/CD, Git
+
+Experiência
+TechCorp | Jan 2022 - Presente
+Desenvolvi microsserviços em FastAPI que processam 50.000 requests/dia
+Implementei pipelines de CI/CD com GitHub Actions e Docker
+Otimizei queries PostgreSQL reduzindo tempo de resposta em 60%
+
+StartupXYZ | Mar 2020 - Dez 2021
+Criei sistema de automação em Python que reduziu custos operacionais em 30%
+
+Formação
+Bacharelado em Ciência da Computação - USP (2019)
+
+Certificações
+AWS Cloud Practitioner
+Python Professional Certificate
+
+Idiomas
+Português: Nativo
+Inglês: Avançado
+    """
+
+    def test_score_minimo_60(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["score"] >= 60, f"CV Canva scored {ats['score']}, expected >= 60"
+
+    def test_secao_sobre_mim_mapeia_summary(self):
+        """'Sobre Mim' (Canva) deve mapear para 'summary'."""
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["detalhes"]["secoes"]["encontradas"]["summary"]["found"], "'Sobre Mim' não reconhecida"
+
+    def test_secao_habilidades_mapeia_skills(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["detalhes"]["secoes"]["encontradas"]["skills"]["found"], "'Habilidades' não reconhecida no Canva"
+
+    def test_todos_contatos_2_colunas(self):
+        """Contatos na coluna direita (Canva) devem ser detectados."""
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        contato = ats["detalhes"]["contato"]["encontrados"]
+        assert contato["email"], "Email em coluna direita não detectado"
+        assert contato["phone"], "Telefone em coluna direita não detectado"
+        assert contato["linkedin"], "LinkedIn em coluna direita não detectado"
+        assert contato["github"], "GitHub em coluna direita não detectado"
+
+    def test_verbos_acao_detectados(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["detalhes"]["verbos_acao"]["total"] >= 3
+
+    def test_metricas_quantificaveis(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["detalhes"]["metricas_quantificaveis"]["total"] >= 2
+
+
+class TestATSFormatoCVMinimo:
+    """CV mínimo/ruim — deve pontuar baixo e gerar sugestões."""
+
+    CV = "João Silva. Trabalho com tecnologia há bastante tempo."
+
+    def test_score_abaixo_30(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["score"] < 30, f"CV mínimo scored {ats['score']}, expected < 30"
+
+    def test_classificacao_precisa_melhorar(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["classificacao"] == "Precisa Melhorar"
+
+    def test_gera_sugestoes(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert len(ats["sugestoes"]) >= 3, "CV ruim deve gerar pelo menos 3 sugestões"
+
+    def test_nenhuma_secao_detectada(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        secoes = ats["detalhes"]["secoes"]["encontradas"]
+        total = sum(1 for s in secoes.values() if s["found"])
+        assert total == 0, f"CV mínimo não deveria ter seções, mas detectou {total}"
+
+
+class TestATSConsistencia:
+    """Testes de consistência e integridade do engine ATS."""
+
+    def test_score_sempre_entre_0_100(self):
+        for cv in ["", "a", "x" * 10000, "Python .NET Angular Docker"]:
+            stacks = detectar_stacks(cv)
+            ats = analisar_ats(cv, stacks)
+            assert 0 <= ats["score"] <= 100, f"Score fora do range: {ats['score']}"
+
+    def test_classificacao_sempre_valida(self):
+        validas = {"Excelente", "Bom", "Regular", "Precisa Melhorar"}
+        for cv in ["", "test", "Python developer with 10 years experience"]:
+            stacks = detectar_stacks(cv)
+            ats = analisar_ats(cv, stacks)
+            assert ats["classificacao"] in validas, f"Classificação inválida: {ats['classificacao']}"
+
+    def test_detalhes_sempre_presentes(self):
+        stacks = detectar_stacks("qualquer texto")
+        ats = analisar_ats("qualquer texto", stacks)
+        assert "detalhes" in ats
+        assert "secoes" in ats["detalhes"]
+        assert "verbos_acao" in ats["detalhes"]
+        assert "metricas_quantificaveis" in ats["detalhes"]
+        assert "contato" in ats["detalhes"]
+        assert "comprimento" in ats["detalhes"]
+        assert "competencias" in ats["detalhes"]
+
+    def test_resumo_sempre_presente(self):
+        stacks = detectar_stacks("qualquer texto")
+        ats = analisar_ats("qualquer texto", stacks)
+        resumo = ats["resumo"]
+        assert "total_palavras" in resumo
+        assert "stacks_detectadas" in resumo
+        assert "secoes_encontradas" in resumo
+
+    def test_sugestoes_sempre_lista(self):
+        stacks = detectar_stacks("qualquer texto")
+        ats = analisar_ats("qualquer texto", stacks)
+        assert isinstance(ats["sugestoes"], list)
+
+    def test_7_secoes_sempre_avaliadas(self):
+        stacks = detectar_stacks("qualquer texto")
+        ats = analisar_ats("qualquer texto", stacks)
+        secoes = ats["detalhes"]["secoes"]["encontradas"]
+        esperadas = {"summary", "experience", "education", "skills", "certifications", "languages", "projects"}
+        assert set(secoes.keys()) == esperadas, f"Seções avaliadas: {set(secoes.keys())}, esperado: {esperadas}"
+
+    def test_5_contatos_sempre_avaliados(self):
+        stacks = detectar_stacks("qualquer texto")
+        ats = analisar_ats("qualquer texto", stacks)
+        contato = ats["detalhes"]["contato"]["encontrados"]
+        esperados = {"email", "phone", "linkedin", "github", "portfolio"}
+        assert set(contato.keys()) == esperados, f"Contatos avaliados: {set(contato.keys())}, esperado: {esperados}"
+
+    def test_score_cresce_com_conteudo(self):
+        """CV vazio deve pontuar menos que CV com conteúdo."""
+        stacks_vazio = detectar_stacks("")
+        ats_vazio = analisar_ats("", stacks_vazio)
+        cv_bom = """
+        Resumo Profissional
+        Desenvolvedor Python.
+        Experiência Profissional
+        Desenvolvi APIs REST que processam 10.000 requests.
+        Formação
+        Ciência da Computação
+        Competências
+        Python, Docker, AWS
+        Certificações
+        AWS Certificate
+        email@test.com
+        linkedin.com/in/test
+        """
+        stacks_bom = detectar_stacks(cv_bom)
+        ats_bom = analisar_ats(cv_bom, stacks_bom)
+        assert ats_bom["score"] > ats_vazio["score"], "CV com conteúdo deve pontuar mais que vazio"
