@@ -101,41 +101,102 @@
     @media(max-width:768px){.feature-row{grid-template-columns:1fr}.feature-row.reverse{direction:ltr}.stats-bar{grid-template-columns:repeat(2,1fr)}.showcase-grid{grid-template-columns:1fr}.demo-section{grid-template-columns:repeat(2,1fr)}.areas-grid{grid-template-columns:1fr}}
     @media(max-width:480px){.stats-bar{grid-template-columns:1fr}.demo-section{grid-template-columns:1fr}}
 
-    /* ───── Print / PDF ───── */
+    /* ───── Print / PDF (landscape, sem margens, qualidade máxima) ───── */
     @media print{
-      @page{size:landscape;margin:10mm 12mm}
+      @page{size:landscape;margin:0}
       *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}
-      body{background:#0a0f0d!important;overflow:visible}
+      body{background:#0a0f0d!important;overflow:visible;-webkit-font-smoothing:antialiased}
 
-      /* Page 1: Hero + Stats juntos */
-      .hero{min-height:auto;padding:2rem 2rem 1rem;break-after:avoid}
+      /* Desabilitar interações e animações */
+      *{transition:none!important;animation:none!important}
       .hero::before{display:none}
-      .hero-cta{box-shadow:none}
-      section{padding:1.5rem 1.5rem;break-inside:avoid}
-      .stats-bar{margin:1rem 0;break-after:page}
+      .hero-cta,.footer-cta{box-shadow:none}
+      .shot-card:hover,.demo-card-sc:hover{transform:none}
 
-      /* Page 2-3: Screenshots grid */
-      .showcase-grid{grid-template-columns:repeat(3,1fr);gap:1.2rem;break-after:page}
-      .shot-img-wrap{height:170px}
-      .shot-card{break-inside:avoid;box-shadow:none}
-      .shot-card:hover{transform:none}
+      /* ─── Page wrapper: cada um = 1 página exata ─── */
+      .print-page{
+        position:relative;
+        page-break-after:always;
+        break-after:page;
+        page-break-inside:avoid;
+        break-inside:avoid;
+        padding:1.8rem 2.5rem 1.5rem;
+        height:100vh;
+        overflow:hidden;
+        box-sizing:border-box
+      }
+      .print-page:last-child{page-break-after:avoid;break-after:avoid}
 
-      /* Page 4-5: Feature rows */
-      .feature-row{break-inside:avoid;margin-bottom:1.5rem;gap:1.5rem}
-      .feature-row + .feature-row.reverse{break-before:page}
-      .feature-image img{box-shadow:none}
+      /* Fade-out suave na borda inferior de cada página */
+      .print-page::after{
+        content:'';
+        position:absolute;
+        bottom:0;left:0;right:0;
+        height:60px;
+        background:linear-gradient(to bottom,transparent 0%,#0a0f0d 100%);
+        pointer-events:none;
+        z-index:10
+      }
+      .print-page:last-child::after{display:none}
 
-      /* Demos: título + cards na mesma página */
-      .demo-section{grid-template-columns:repeat(5,1fr);break-inside:avoid;break-after:page}
+      /* ─── Geral ─── */
+      section{padding:.8rem 0;max-width:100%}
+      .section-label{font-size:.7rem;margin-bottom:.3rem}
+      .section-title{font-size:1.6rem;margin-bottom:.3rem}
+      .section-desc{font-size:.85rem;margin-bottom:1rem;max-width:100%}
 
-      /* Areas */
-      .areas-grid{grid-template-columns:repeat(2,1fr)}
+      /* ─── P1: Hero + Stats ─── */
+      .hero{min-height:auto;padding:2rem 2.5rem 1rem;break-after:avoid}
+      .hero h1{font-size:3rem}
+      .hero p{font-size:1rem}
+      .hero-pipeline{margin-top:1rem}
+      .hero-stack{margin-top:1.2rem}
+      .hero-cta{margin-top:1.5rem;padding:.7rem 1.8rem}
+      .stats-bar{margin:.8rem 0;gap:.8rem}
+      .stat-card{padding:1rem .8rem}
+      .stat-card .number{font-size:1.8rem}
+      .stat-card .label{font-size:.72rem}
 
-      /* Timeline + Footer juntos na última página */
+      /* ─── P2: Screenshots 9 cards em 3×3 (compactos) ─── */
+      .showcase-grid{grid-template-columns:repeat(3,1fr);gap:.7rem}
+      .shot-img-wrap{height:100px}
+      .shot-card{break-inside:avoid;box-shadow:none;border-radius:10px}
+      .shot-info{padding:.4rem .7rem .5rem}
+      .shot-info .shot-title{font-size:.8rem;margin-bottom:.15rem}
+      .shot-info .shot-desc{font-size:.65rem;line-height:1.3}
+      .shot-tag{font-size:.6rem;padding:.1rem .4rem;margin-bottom:.2rem}
+
+      /* ─── P3-P4: Feature rows (2 por página) ─── */
+      .feature-row{break-inside:avoid;margin-bottom:1rem;gap:1.5rem}
+      .feature-image img{box-shadow:none;border-radius:10px}
+      .feature-image::before,.feature-image::after{display:none}
+      .feature-text h3{font-size:1.2rem;margin-bottom:.4rem}
+      .feature-text p{font-size:.8rem;line-height:1.5;margin-bottom:.5rem}
+      .feature-badges span{font-size:.65rem;padding:.15rem .45rem}
+      .feature-badges{gap:.3rem}
+
+      /* ─── P5: Demos + Areas ─── */
+      .demo-section{grid-template-columns:repeat(5,1fr);break-inside:avoid;gap:.8rem}
+      .demo-card-sc{padding:1rem .6rem;border-radius:10px}
+      .demo-card-sc .demo-icon{font-size:2rem;margin-bottom:.3rem}
+      .demo-card-sc .demo-name{font-size:.85rem}
+      .demo-card-sc .demo-area{font-size:.7rem}
+      .demo-card-sc .demo-stacks{font-size:.65rem}
+      .areas-grid{grid-template-columns:repeat(2,1fr);gap:.6rem;break-inside:avoid}
+      .area-card{padding:.6rem .8rem;border-radius:8px}
+      .area-card .area-icon{font-size:1.4rem}
+      .area-card .area-name{font-size:.82rem}
+      .area-card .area-count{font-size:.68rem}
+
+      /* ─── P6: Timeline + Footer ─── */
       .timeline{break-inside:avoid}
-      .timeline-item{break-inside:avoid}
-      footer{padding:1.5rem 2rem}
-      .footer-cta{box-shadow:none}
+      .timeline-item{break-inside:avoid;margin-bottom:1.2rem}
+      .timeline-item h4{font-size:.9rem}
+      .timeline-item p{font-size:.78rem;line-height:1.4}
+      .timeline::before{width:2px}
+      .timeline-item::before{width:10px;height:10px;left:-2.55rem}
+      footer{padding:1.5rem 0}
+      footer .footer-cta{padding:.5rem 1.2rem;font-size:.8rem;border-radius:8px}
 
       /* Prevent orphan breaks */
       h2,h3,h4{break-after:avoid}
@@ -145,7 +206,8 @@
 </head>
 <body>
 
-  <!-- ═══════ HERO ═══════ -->
+  <!-- ═══════ PAGE 1: HERO + STATS ═══════ -->
+  <div class="print-page">
   <div class="hero">
     <div class="hero-badge">🔭 Projeto Open Source</div>
     <h1>Stack Radar</h1>
@@ -181,12 +243,14 @@
       <div class="stat-card"><div class="number">228</div><div class="label">Competências</div></div>
       <div class="stat-card"><div class="number">8</div><div class="label">Áreas Profissionais</div></div>
       <div class="stat-card"><div class="number">5</div><div class="label">Demos Interativos</div></div>
-      <div class="stat-card"><div class="number">151</div><div class="label">Testes Passando</div></div>
+      <div class="stat-card"><div class="number">235</div><div class="label">Testes Passando</div></div>
       <div class="stat-card"><div class="number">ATS</div><div class="label">Score 0–100</div></div>
     </div>
   </section>
+  </div><!-- /print-page 1 -->
 
-  <!-- ═══════ SCREENSHOTS GRID ═══════ -->
+  <!-- ═══════ PAGE 2: SCREENSHOTS (6 primeiros) ═══════ -->
+  <div class="print-page">
   <section>
     <div class="section-label">Capturas reais</div>
     <h2 class="section-title">O app em ação</h2>
@@ -295,8 +359,10 @@
 
     </div>
   </section>
+  </div><!-- /print-page 2 -->
 
-  <!-- ═══════ FEATURE: PIPELINE ═══════ -->
+  <!-- ═══════ PAGE 3: FEATURES 1-2 ═══════ -->
+  <div class="print-page">
   <section>
     <div class="section-label">Destaques</div>
     <h2 class="section-title">Funcionalidades em detalhe</h2>
@@ -333,6 +399,14 @@
         </div>
       </div>
     </div>
+  </section>
+  </div><!-- /print-page 3 -->
+
+  <!-- ═══════ PAGE 4: FEATURES 3-4 ═══════ -->
+  <div class="print-page">
+  <section>
+    <div class="section-label">Destaques (cont.)</div>
+    <h2 class="section-title">Mais funcionalidades</h2>
 
     <div class="feature-row">
       <div class="feature-image">
@@ -340,7 +414,7 @@
       </div>
       <div class="feature-text">
         <h3>228 Competências em 8 Áreas</h3>
-        <p>De TI (127 stacks) a Saúde, Educação, Design, Marketing, Finanças, Engenharia e Logística. O currículo de um enfermeiro ou professor é tão bem analisado quanto o de um desenvolvedor full stack. Cada stack tem código real ou conteúdo profissional.</p>
+        <p>De TI (127 stacks) a Saúde, Educação, Design, Marketing, Finanças, Engenharia e Logística. O currículo de um enfermeiro ou professor é tão bem analisado quanto o de um desenvolvedor full stack.</p>
         <div class="feature-badges">
           <span>TI (127)</span>
           <span>Saúde (25)</span>
@@ -357,7 +431,7 @@
         <img src="imagens/07-demo-ti-code-viewer-python.png" alt="Code Viewer" />
       </div>
       <div class="feature-text">
-        <h3>Code Viewer + "Você Sabia?"</h3>
+        <h3>Code Viewer + “Você Sabia?”</h3>
         <p>Clique em qualquer stack para ver um exemplo de código real com syntax highlight. Cada tecnologia também exibe uma curiosidade histórica ou técnica — conteúdo educacional integrado à análise profissional.</p>
         <div class="feature-badges">
           <span>Syntax Highlight</span>
@@ -368,8 +442,10 @@
       </div>
     </div>
   </section>
+  </div><!-- /print-page 4 -->
 
-  <!-- ═══════ 5 DEMOS ═══════ -->
+  <!-- ═══════ PAGE 5: DEMOS + ÁREAS ═══════ -->
+  <div class="print-page">
   <section>
     <div class="section-label">Demonstrações</div>
     <h2 class="section-title">5 perfis interativos</h2>
@@ -474,8 +550,10 @@
       </div>
     </div>
   </section>
+  </div><!-- /print-page 5 -->
 
-  <!-- ═══════ DESAFIOS ═══════ -->
+  <!-- ═══════ PAGE 6: TIMELINE + FOOTER ═══════ -->
+  <div class="print-page">
   <section>
     <div class="section-label">Jornada</div>
     <h2 class="section-title">Desafios superados</h2>
@@ -522,6 +600,7 @@
       <a href="https://github.com/masilvaarcs/stack-radar">github.com/masilvaarcs/stack-radar</a>
     </p>
   </footer>
+  </div><!-- /print-page 6 -->
 
 </body>
 </html>
