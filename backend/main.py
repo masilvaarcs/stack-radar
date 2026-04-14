@@ -9,7 +9,7 @@ Fluxo real:
   4. Browser       → recebe eventos em tempo real e exibe
 """
 
-import os, json, re, asyncio, threading, uuid, logging
+import os, json, re, asyncio, threading, uuid, logging, unicodedata
 from datetime import datetime
 from pathlib import Path
 from contextlib import asynccontextmanager
@@ -798,9 +798,33 @@ def detectar_stacks(texto: str) -> list[dict]:
 def extrair_texto_pdf(conteudo: bytes) -> str:
     doc = fitz.open(stream=conteudo, filetype="pdf")
     texto = ""
+    urls_extraidas: list[str] = []
     for pagina in doc:
-        texto += pagina.get_text()
+        # sort=True: reordena blocos top-left→bottom-right (melhora layouts multi-coluna como Canva)
+        texto += pagina.get_text(sort=True)
+        # Extrair URLs de hyperlinks/anotações (email, LinkedIn, GitHub que são links clicáveis)
+        for link in pagina.get_links():
+            uri = link.get("uri", "")
+            if uri:
+                urls_extraidas.append(uri)
     doc.close()
+    # Anexar URLs extraídas ao final do texto para que a análise ATS as detecte
+    if urls_extraidas:
+        texto += "\n" + "\n".join(urls_extraidas)
+    # Normalizar Unicode (Canva usa composições diferentes de acentos)
+    texto = unicodedata.normalize("NFKC", texto)
+    return texto
+
+
+def _normalizar_texto_ats(texto: str) -> str:
+    """Normaliza texto para maximizar detecção ATS.
+    Remove espaçamentos extras, normaliza Unicode, limpa artefatos de extração."""
+    # Normalizar Unicode
+    texto = unicodedata.normalize("NFKC", texto)
+    # Colapsar múltiplos espaços em um (Canva insere espaços decorativos)
+    texto = re.sub(r'[ \t]{2,}', '  ', texto)
+    # Remover zero-width chars e soft hyphens
+    texto = re.sub(r'[\u200b\u200c\u200d\u00ad\ufeff]', '', texto)
     return texto
 
 # ─────────────────────────────────────────────────────────────
@@ -819,6 +843,7 @@ ATS_CONFIG = _load_ats_config()
 
 def analisar_ats(texto: str, stacks_encontradas: list[dict]) -> dict:
     """Analisa o texto do CV e retorna métricas ATS."""
+    texto = _normalizar_texto_ats(texto)
     texto_lower = texto.lower()
     linhas = texto.strip().split("\n")
     palavras = texto.split()
@@ -832,18 +857,28 @@ def analisar_ats(texto: str, stacks_encontradas: list[dict]) -> dict:
 
     # Suporta formato dict {key: {weight, names}} ou list [{key, weight, names}]
     if isinstance(secoes_cfg, dict):
-        secoes_iter = secoes_cfg.items()
+        secoes_iter = list(secoes_cfg.items())
     else:
-        secoes_iter = ((s["key"], s) for s in secoes_cfg)
+        secoes_iter = [(s["key"], s) for s in secoes_cfg]
 
     for key, cfg in secoes_iter:
         weight = cfg.get("weight", 5)
         names = cfg.get("names", [key])
         total_peso_secoes += weight
-        encontrada = any(
-            re.search(r'(?:^|\n)\s*' + re.escape(nome), texto_lower)
-            for nome in names
-        )
+        encontrada = False
+        for nome in names:
+            if encontrada:
+                break
+            nome_esc = re.escape(nome)
+            # 1º: início de linha (match forte — formato padrão de CV)
+            if re.search(r'(?:^|\n)\s*' + nome_esc, texto_lower):
+                encontrada = True
+            # 2º: após duplo espaço (Canva separa colunas com espaços)
+            elif re.search(r'(?:^|\n|  )\s*' + nome_esc, texto_lower):
+                encontrada = True
+            # 3º: word boundary em qualquer posição (fallback para PDFs desestruturados)
+            elif re.search(r'\b' + nome_esc + r'\b', texto_lower):
+                encontrada = True
         secoes[key] = {
             "found": encontrada,
             "weight": weight,
@@ -879,11 +914,21 @@ def analisar_ats(texto: str, stacks_encontradas: list[dict]) -> dict:
         found = False
         if isinstance(patterns, list):
             for pat in patterns:
-                if re.search(re.escape(pat) if not any(c in pat for c in r'\.[]()+*?{}|^$') else pat, texto, re.IGNORECASE):
-                    found = True
-                    break
+                try:
+                    # Tenta como regex primeiro (padrões com \d, \(, etc.)
+                    if re.search(pat, texto, re.IGNORECASE):
+                        found = True
+                        break
+                except re.error:
+                    # Se não é regex válido, busca como texto literal
+                    if pat.lower() in texto_lower:
+                        found = True
+                        break
         elif isinstance(patterns, str):
-            found = bool(re.search(patterns, texto, re.IGNORECASE))
+            try:
+                found = bool(re.search(patterns, texto, re.IGNORECASE))
+            except re.error:
+                found = patterns.lower() in texto_lower
         contato[key] = found
         if found:
             score_contato += 20
