@@ -4,6 +4,7 @@ Cobre: health, stacks, stack/{id}, upload, detecção de stacks, curiosity, STAC
 """
 import sys
 import os
+import re
 import json
 import pytest
 from unittest.mock import patch, MagicMock
@@ -34,6 +35,12 @@ class TestHealth:
     def test_health_has_timestamp(self):
         data = client.get("/health").json()
         assert len(data["timestamp"]) > 10  # ISO format
+
+    def test_health_has_version(self):
+        data = client.get("/health").json()
+        assert "version" in data
+        assert "released" in data
+        assert re.match(r"^\d+\.\d+\.\d+$", data["version"])
 
 
 # ─────────────────────────────────────────────────────────────

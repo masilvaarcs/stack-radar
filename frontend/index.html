@@ -673,6 +673,19 @@ footer { border-top: 1px solid var(--border); padding: 2.5rem 0 3rem; text-align
 .flink.l { background: rgba(96,165,250,.07); border-color: rgba(96,165,250,.25); color: var(--blue); }
 .flink.l:hover { background: rgba(96,165,250,.14); box-shadow: 0 0 14px rgba(96,165,250,.2); }
 .fcopy { font-family: var(--mono); font-size: .63rem; color: var(--foot-copy); letter-spacing: 1px; text-transform: uppercase; }
+.fversion {
+  display: inline-flex; align-items: center; gap: .5rem;
+  margin-top: .75rem; padding: .3rem .85rem;
+  border-radius: 100px; border: 1px solid rgba(245,158,11,.18);
+  background: rgba(245,158,11,.06);
+  font-family: var(--mono); font-size: .62rem; color: var(--muted);
+  letter-spacing: .5px; transition: opacity .3s;
+}
+.fversion .fv-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,.5);
+}
+.fversion .fv-label { color: var(--amber); font-weight: 600; }
 
 @media(max-width:640px){
   h1{font-size:2rem}
@@ -909,6 +922,11 @@ footer { border-top: 1px solid var(--border); padding: 2.5rem 0 3rem; text-align
       <a class="flink l" href="https://www.linkedin.com/in/marcosprogramador" target="_blank" rel="noopener">💼 LinkedIn</a>
     </div>
     <div class="fcopy">stack-radar · fastapi · pika · rabbitmq · websocket · 2026</div>
+    <div class="fversion" id="app-version" style="opacity:0">
+      <span class="fv-dot"></span>
+      <span class="fv-label">v—</span>
+      <span class="fv-date">carregando…</span>
+    </div>
   </div>
 </footer>
 
@@ -961,6 +979,21 @@ let processados     = 0;
 let totalStacks     = 0;
 let filtroAtivo     = 'Todos';
 let serverOnline    = false;
+
+// ── Version badge ──
+(async function loadVersion() {
+  try {
+    const r = await fetch(API + '/health');
+    if (!r.ok) return;
+    const d = await r.json();
+    const el = document.getElementById('app-version');
+    if (!el || !d.version) return;
+    el.querySelector('.fv-label').textContent = 'v' + d.version;
+    const dt = d.released ? new Date(d.released + 'T00:00:00').toLocaleDateString('pt-BR', {day:'2-digit',month:'short',year:'numeric'}) : '';
+    el.querySelector('.fv-date').textContent = dt || '';
+    el.style.opacity = '1';
+  } catch {}
+})();
 
 // ── XSS protection: escapa HTML em dados dinâmicos ──
 function esc(s) { const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }

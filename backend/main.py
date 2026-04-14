@@ -11,6 +11,9 @@ Fluxo real:
 
 import os, json, re, asyncio, threading, uuid, logging, unicodedata
 from datetime import datetime
+
+APP_VERSION = "2.3.0"
+APP_RELEASED = "2025-06-14"
 from pathlib import Path
 from contextlib import asynccontextmanager
 
@@ -1192,7 +1195,7 @@ async def lifespan(app: FastAPI):
     yield
     log.info("Stack Radar encerrando")
 
-app = FastAPI(title="Stack Radar", version="1.0.0", lifespan=lifespan)
+app = FastAPI(title="Stack Radar", version=APP_VERSION, lifespan=lifespan)
 
 # ── Security headers middleware ──
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
@@ -1229,7 +1232,12 @@ async def index():
 
 @app.get("/health")
 async def health():
-    return {"status": "ok", "timestamp": datetime.utcnow().isoformat()}
+    return {
+        "status": "ok",
+        "version": APP_VERSION,
+        "released": APP_RELEASED,
+        "timestamp": datetime.utcnow().isoformat(),
+    }
 
 @app.get("/stacks")
 async def listar_stacks():
