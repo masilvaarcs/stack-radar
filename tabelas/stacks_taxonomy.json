@@ -2648,7 +2648,9 @@
           "experience",
           "experiência profissional",
           "histórico profissional",
-          "work experience"
+          "work experience",
+          "professional experience",
+          "experiencia"
         ]
       },
       "education": {
@@ -2659,7 +2661,9 @@
           "educação",
           "formação acadêmica",
           "escolaridade",
-          "academic background"
+          "academic background",
+          "formacao academica",
+          "formacao"
         ]
       },
       "skills": {
@@ -2674,7 +2678,12 @@
           "ferramentas",
           "top skills",
           "technical skills",
-          "core competencies"
+          "core competencies",
+          "competências técnicas",
+          "principais competências",
+          "competencias",
+          "stack técnica",
+          "stack tecnica"
         ]
       },
       "certifications": {
@@ -2686,7 +2695,9 @@
           "cursos",
           "licenses & certifications",
           "honors & awards",
-          "licenses"
+          "licenses",
+          "honors-awards",
+          "certificacoes"
         ]
       },
       "languages": {
@@ -2710,7 +2721,8 @@
           "volunteer experience",
           "achievements",
           "conquistas",
-          "realizações"
+          "realizações",
+          "social network profiles"
         ]
       }
     },
@@ -2804,7 +2816,23 @@
       "architected",
       "refactored",
       "orchestrated",
-      "spearheaded"
+      "spearheaded",
+      "sustentei",
+      "resolvi",
+      "administrei",
+      "conduzi",
+      "prestei",
+      "ministrei",
+      "estruturei",
+      "atendi",
+      "realizei",
+      "sustentou",
+      "resolveu",
+      "administrou",
+      "conduziu",
+      "ministrou",
+      "estruturou",
+      "realizou"
     ],
     "quantifiers_patterns": [
       "\\d+%",

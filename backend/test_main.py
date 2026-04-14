@@ -1135,3 +1135,208 @@ class TestATSConsistencia:
         stacks_bom = detectar_stacks(cv_bom)
         ats_bom = analisar_ats(cv_bom, stacks_bom)
         assert ats_bom["score"] > ats_vazio["score"], "CV com conteúdo deve pontuar mais que vazio"
+
+
+# ─────────────────────────────────────────────────────────────
+#  VALIDAÇÃO CRÍTICA: ATS_CONFIG CARREGADO
+# ─────────────────────────────────────────────────────────────
+class TestATSConfigCarregado:
+    """Garante que o ats_config foi carregado do JSON — impede deploy quebrado."""
+
+    def test_ats_config_nao_vazio(self):
+        from main import ATS_CONFIG
+        assert ATS_CONFIG, "ATS_CONFIG está vazio — tabelas/stacks_taxonomy.json não foi carregado!"
+
+    def test_sections_expected_tem_7_secoes(self):
+        from main import ATS_CONFIG
+        secoes = ATS_CONFIG.get("sections_expected", {})
+        assert len(secoes) == 7, f"Esperado 7 seções, encontrado {len(secoes)}"
+
+    def test_action_verbs_minimo_80(self):
+        from main import ATS_CONFIG
+        verbos = ATS_CONFIG.get("action_verbs", [])
+        assert len(verbos) >= 80, f"Esperado ≥80 verbos, encontrado {len(verbos)}"
+
+    def test_contact_patterns_tem_5_grupos(self):
+        from main import ATS_CONFIG
+        contatos = ATS_CONFIG.get("contact_patterns", {})
+        assert len(contatos) == 5, f"Esperado 5 grupos de contato, encontrado {len(contatos)}"
+
+    def test_quantifiers_patterns_tem_10(self):
+        from main import ATS_CONFIG
+        quant = ATS_CONFIG.get("quantifiers_patterns", [])
+        assert len(quant) >= 10, f"Esperado ≥10 padrões, encontrado {len(quant)}"
+
+    def test_secoes_contem_chaves_esperadas(self):
+        from main import ATS_CONFIG
+        secoes = ATS_CONFIG.get("sections_expected", {})
+        esperadas = {"summary", "experience", "education", "skills", "certifications", "languages", "projects"}
+        assert set(secoes.keys()) == esperadas
+
+
+# ─────────────────────────────────────────────────────────────
+#  FORMATO LINKEDIN PDF REAL (9 páginas = formato exportado)
+# ─────────────────────────────────────────────────────────────
+class TestATSFormatoLinkedInPDFReal:
+    """PDF exportado direto do LinkedIn — 9 páginas, seções em PT-BR misturadas com EN."""
+
+    CV = """
+Contato
+Gravataí / RS
+51984228067 (Mobile)
+masilva.arcs@gmail.com
+www.linkedin.com/in/marcosprogramador (LinkedIn)
+masilvaarcs.github.io/portfolio-hub (Portfolio)
+
+Principais competências
+.NET Framework
+Angular (Framework)
+Microsoft SQL Server
+
+Languages
+Inglês (Limited Working)
+Português (Native or Bilingual)
+
+Certifications
+Certificate of Completion: CSS Fundamentals course
+Iniciando com ASP.NET Core
+DevOps Essentials Professional Certificate (DEPC)
+
+Honors-Awards
+AGILE FUNDAMENTALS
+
+Marcos Santos da Silva
+Desenvolvedor Full Stack Sênior | .NET C# · Angular · Python +20 anos de experiência
+Gravataí, Rio Grande do Sul, Brasil
+
+Resumo
+Desenvolvedor Full Stack Sênior com mais de 20 anos de experiência em sistemas críticos, ERP e WMS.
+Especialista em .NET C# e Angular; aplico arquitetura limpa, SOLID e Design Patterns para entregar
+soluções escaláveis e seguras. Liderei projetos complexos que integraram operações críticas.
+
+Experiência
+Octafy LAD
+1 ano 4 meses
+Desenvolvedor Full Stack (Angular | .NET)
+maio de 2025 - março de 2026 (11 meses)
+Gravataí, Rio Grande do Sul, Brasil
+
+Desenvolvi e evoluí 25 componentes de pages em Angular (84% das rotas concluídas)
+Integrei frontend Angular ↔ WebAPI RESTful (.NET C#) ↔ WebServices ASMX/SOAP
+Criei scripts Python para geração de dashboards de evolução
+Elaborei documentação técnica completa (relatórios de evolução, FAQ Técnico v1.3.0)
+Utilizei GitHub Copilot e Claude AI para análise de lógica complexa
+
+Grupo Apisul
+Desenvolvedor .NET
+outubro de 2023 - julho de 2024 (10 meses)
+Desenvolvi novas funcionalidades e corrigi bugs em sistemas complexos com .NET e SQL
+Executei testes de unidade de forma recorrente
+Participei ativamente de rituais ágeis (daily, sprint planning)
+
+Formação acadêmica
+Escola Estadual Marechal Mascarenhas de Moraes
+Técnico em Processamento de Dados, Informática
+1997 - 1999
+    """
+
+    def test_score_minimo_60(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["score"] >= 60, f"LinkedIn PDF real scored {ats['score']}, expected >= 60"
+
+    def test_secao_resumo(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["detalhes"]["secoes"]["encontradas"]["summary"]["found"], "Seção 'Resumo' do LinkedIn não reconhecida"
+
+    def test_secao_experiencia(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["detalhes"]["secoes"]["encontradas"]["experience"]["found"], "'Experiência' do LinkedIn não reconhecida"
+
+    def test_secao_formacao_academica(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["detalhes"]["secoes"]["encontradas"]["education"]["found"], "'Formação acadêmica' do LinkedIn não reconhecida"
+
+    def test_secao_competencias(self):
+        """LinkedIn usa 'Principais competências' — deve mapear para skills."""
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["detalhes"]["secoes"]["encontradas"]["skills"]["found"], "'Principais competências' do LinkedIn não reconhecida"
+
+    def test_secao_certifications(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["detalhes"]["secoes"]["encontradas"]["certifications"]["found"], "'Certifications' do LinkedIn não reconhecida"
+
+    def test_secao_languages(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["detalhes"]["secoes"]["encontradas"]["languages"]["found"], "'Languages' do LinkedIn não reconhecida"
+
+    def test_secao_honors_awards(self):
+        """LinkedIn usa 'Honors-Awards' — deve mapear para certifications ou projects."""
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        # honors-awards mapeia para certifications
+        certs = ats["detalhes"]["secoes"]["encontradas"]["certifications"]["found"]
+        # Se não, pode mapear via projects (honors & awards)
+        proj = ats["detalhes"]["secoes"]["encontradas"]["projects"]["found"]
+        assert certs or proj, "'Honors-Awards' não reconhecido em nenhuma seção"
+
+    def test_minimo_6_secoes(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        secoes = ats["detalhes"]["secoes"]["encontradas"]
+        total = sum(1 for s in secoes.values() if s["found"])
+        assert total >= 6, f"Apenas {total}/7 seções no LinkedIn PDF"
+
+    def test_email_detectado(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["detalhes"]["contato"]["encontrados"]["email"], "Email não detectado no LinkedIn PDF"
+
+    def test_phone_detectado(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["detalhes"]["contato"]["encontrados"]["phone"], "Telefone não detectado no LinkedIn PDF"
+
+    def test_linkedin_detectado(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["detalhes"]["contato"]["encontrados"]["linkedin"], "LinkedIn não detectado no LinkedIn PDF"
+
+    def test_portfolio_detectado(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        assert ats["detalhes"]["contato"]["encontrados"]["portfolio"], "Portfolio não detectado no LinkedIn PDF"
+
+    def test_verbos_minimo_5(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        total = ats["detalhes"]["verbos_acao"]["total"]
+        assert total >= 5, f"Apenas {total} verbos no LinkedIn PDF"
+
+    def test_metricas_minimo_2(self):
+        stacks = detectar_stacks(self.CV)
+        ats = analisar_ats(self.CV, stacks)
+        total = ats["detalhes"]["metricas_quantificaveis"]["total"]
+        assert total >= 2, f"Apenas {total} métricas no LinkedIn PDF"
+
+
+# ─────────────────────────────────────────────────────────────
+#  TESTE ANTI-REGRESSÃO: DOCKERFILE DEVE COPIAR tabelas/
+# ─────────────────────────────────────────────────────────────
+class TestDockerfileIntegridade:
+    """Garante que o Dockerfile copia tabelas/ para o container."""
+
+    def test_dockerfile_copia_tabelas(self):
+        import pathlib
+        dockerfile = pathlib.Path(__file__).parent.parent / "Dockerfile"
+        if dockerfile.exists():
+            conteudo = dockerfile.read_text(encoding="utf-8")
+            assert "tabelas" in conteudo.lower(), (
+                "Dockerfile NÃO copia tabelas/ — ATS ficará zerado em produção!"
+            )

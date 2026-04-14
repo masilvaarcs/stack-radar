@@ -843,6 +843,10 @@ def _load_ats_config() -> dict:
     return {}
 
 ATS_CONFIG = _load_ats_config()
+if ATS_CONFIG:
+    log.info(f"ATS config carregado: {len(ATS_CONFIG.get('sections_expected', {}))} seções, {len(ATS_CONFIG.get('action_verbs', []))} verbos, {len(ATS_CONFIG.get('contact_patterns', {}))} contatos")
+else:
+    log.warning("ATS config NÃO carregado — análise ATS terá resultados zerados")
 
 def analisar_ats(texto: str, stacks_encontradas: list[dict]) -> dict:
     """Analisa o texto do CV e retorna métricas ATS."""

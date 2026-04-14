@@ -12,6 +12,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY backend/ .
 COPY frontend/ /app/frontend/
+COPY tabelas/ /app/tabelas/
 
 # Usuário não-root
 RUN useradd -m appuser && chown -R appuser /app
