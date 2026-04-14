@@ -227,7 +227,7 @@ def callback(ch, method, properties, body):
 stack-radar/
 ├── backend/
 │   ├── main.py              ← FastAPI + RabbitMQ + WebSocket + ATS Engine
-│   ├── test_main.py         ← 151 testes unitários (pytest)
+│   ├── test_main.py         ← 235 testes unitários (pytest)
 │   ├── requirements.txt
 │   └── Dockerfile           ← build local
 ├── tabelas/
@@ -272,7 +272,7 @@ stack-radar/
 | ![Header](docs/imagens/01-header-pipeline-visual.png) | Header com pipeline visual animado |
 | ![5 Demos](docs/imagens/02-upload-zone-5-demos.png) | Upload zone + 5 cards de demo |
 | ![ATS Dashboard](docs/imagens/04-demo-ti-ats-dashboard.png) | Dashboard ATS: score 72 + 6 dimensões |
-| ![Stacks Grid](docs/imagens/06-demo-ti-stacks-grid-17.png) | Grid de 17 stacks com filtros |
+| ![Stacks Grid](docs/imagens/06-demo-ti-stacks-grid-17.png) | Grid de 17 stacks TI com filtros |
 | ![Code Viewer](docs/imagens/07-demo-ti-code-viewer-python.png) | Code Viewer Python + "Você Sabia?" |
 | ![Educação](docs/imagens/10-demo-educacao-selecionado.png) | Demo Educação — multi-área |
 | ![PDF Real](docs/imagens/09-upload-pdf-real-resultado.png) | Resultado de CV real: 10 stacks |

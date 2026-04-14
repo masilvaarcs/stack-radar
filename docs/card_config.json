@@ -2,22 +2,24 @@
     "project_title": "🔭 STACK RADAR",
     "project_subtitle": "PDF → PyMuPDF → RabbitMQ → WebSocket → Live Code",
     "metrics": [
-        {"value": "17", "label": "STACKS", "color": "#F59E0B"},
-        {"value": "6", "label": "ENDPOINTS", "color": "#009688"},
-        {"value": "1", "label": "BROKER AMQP", "color": "#FF6600"},
+        {"value": "228", "label": "COMPETÊNCIAS", "color": "#F59E0B"},
+        {"value": "7", "label": "ENDPOINTS", "color": "#009688"},
+        {"value": "235", "label": "TESTES", "color": "#00E676"},
         {"value": "✔", "label": "DEPLOY OK", "color": "#00E676"}
     ],
     "evidences_left": [
         "Upload PDF com drag & drop",
         "Extração de texto via PyMuPDF",
-        "17 stacks detectáveis automaticamente",
-        "Producer publica mensagens durable"
+        "228 competências em 8 áreas profissionais",
+        "Producer publica mensagens durable",
+        "Score ATS de 0 a 100 com 6 dimensões"
     ],
     "evidences_right": [
         "Consumer com prefetch=1 e ACK manual",
         "WebSocket entrega eventos em tempo real",
-        "Code viewer com syntax highlighting",
-        "Deploy funcional no Railway"
+        "5 demos interativos (TI, Saúde, Design, Educação, Finanças)",
+        "Deploy funcional no Railway",
+        "Indicador de versão live via /health"
     ],
     "stack": [
         {"name": "Python", "color": "#3776AB"},
@@ -28,5 +30,5 @@
         {"name": "PyMuPDF", "color": "#4FC08D"}
     ],
     "accent_colors": ["#F59E0B", "#FF6600", "#009688"],
-    "footer_text": "Evidência capturada em 13/04/2026 · Python 3.12 · FastAPI 0.115 · RabbitMQ 3.13 · Windows"
+    "footer_text": "Evidência capturada em 14/04/2026 · Python 3.12 · FastAPI 0.115 · RabbitMQ 3.13 · v2.3.0"
 }
